@@ -15,8 +15,10 @@ public class TestMecanum extends LinearOpMode {
         DcMotor fR = hardwareMap.dcMotor.get("fR");
         DcMotor bR = hardwareMap.dcMotor.get("bR");
 
-        fR.setDirection(DcMotorSimple.Direction.REVERSE);
-        bR.setDirection(DcMotorSimple.Direction.REVERSE);
+        fR.setDirection(DcMotor.Direction.REVERSE);
+        bR.setDirection(DcMotor.Direction.REVERSE);
+        fL.setDirection(DcMotor.Direction.FORWARD);
+        bL.setDirection(DcMotor.Direction.FORWARD);
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
