@@ -15,9 +15,14 @@ public class TestMecanum extends LinearOpMode {
         DcMotor fR = hardwareMap.dcMotor.get("fR");
         DcMotor bR = hardwareMap.dcMotor.get("bR");
 
-        fR.setDirection(DcMotor.Direction.REVERSE);
-        bR.setDirection(DcMotor.Direction.REVERSE);
-        fL.setDirection(DcMotor.Direction.FORWARD);
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        fR.setDirection(DcMotor.Direction.FORWARD);
+        bR.setDirection(DcMotor.Direction.FORWARD);
+        fL.setDirection(DcMotor.Direction.REVERSE);
         bL.setDirection(DcMotor.Direction.FORWARD);
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -49,6 +54,12 @@ public class TestMecanum extends LinearOpMode {
             bL.setPower(backLeftPower);
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
+
+            telemetry.addData("FL encoder value:", fL.getCurrentPosition());
+            telemetry.addData("FR encoder value:", fR.getCurrentPosition());
+            telemetry.addData("BL encoder value:", bL.getCurrentPosition());
+            telemetry.addData("BR encoder value:", bR.getCurrentPosition());
+            telemetry.update();
         }
     }
 }
