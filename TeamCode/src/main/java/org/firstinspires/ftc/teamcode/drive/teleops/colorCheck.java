@@ -19,6 +19,6 @@ public class colorCheck extends LinearOpMode {
         }
 
         //IF THE WRIST EVER POINTS DOWN, YOU ARE BONED. GG. UNLUCKY
-        
+
     }
 }
