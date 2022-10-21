@@ -50,10 +50,13 @@ public class TestMecanum extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
+
+
             fL.setPower(frontLeftPower);
             bL.setPower(backLeftPower);
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
+
 
             telemetry.addData("FL encoder value:", fL.getCurrentPosition());
             telemetry.addData("FR encoder value:", fR.getCurrentPosition());

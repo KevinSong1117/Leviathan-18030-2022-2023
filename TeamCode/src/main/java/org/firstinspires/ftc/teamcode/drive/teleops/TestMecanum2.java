@@ -29,12 +29,38 @@ public class TestMecanum2 extends LinearOpMode {
 
         while(opModeIsActive()){
             double x = gamepad1.left_stick_x;
-            double y = gamepad1.left_stick_y;
+            double y = -gamepad1.left_stick_y;
             double turn = gamepad1.right_stick_x;
 
+            double theta = Math.atan2(y,x);
+            double power = Math.hypot(x,y);
 
+            double sin = Math.sin(theta - Math.PI/4);
+            double cos = Math.cos(theta - Math.PI/4);
+            double max = Math.max(Math.abs(sin), Math.abs(cos));
+
+            double leftFront = power * cos/max + turn;
+            double rightFront = power * sin/max - turn;
+            double rightBack = power * sin/max + turn;
+            double leftBack = power * cos/max - turn;
+
+            if((power + Math.abs(turn))> 1){
+                leftFront /= power + turn;
+                rightFront /= power + turn;
+                rightBack /= power + turn;
+                leftBack /= power + turn;
+            }
+
+            fL.setPower(leftFront);
+            bL.setPower(leftBack);
+            fR.setPower(rightFront);
+            bR.setPower(rightBack);
+
+            telemetry.addData("FL encoder value:", fL.getCurrentPosition());
+            telemetry.addData("FR encoder value:", fR.getCurrentPosition());
+            telemetry.addData("BL encoder value:", bL.getCurrentPosition());
+            telemetry.addData("BR encoder value:", bR.getCurrentPosition());
+            telemetry.update();
         }
-
-
     }
 }
