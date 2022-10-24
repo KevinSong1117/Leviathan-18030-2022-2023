@@ -103,16 +103,16 @@ public class Vision extends LinearOpMode{
         int pixel = rgbImage.getPixel(x, y);
         // w = 640
         // h = 480
-        opMode.telemetry.addData("w", rgbImage.getWidth());
-        opMode.telemetry.addData("h", rgbImage.getHeight());
+        telemetry.addData("w", rgbImage.getWidth());
+        telemetry.addData("h", rgbImage.getHeight());
 
-        opMode.telemetry.addData("red", red(pixel));
-        opMode.telemetry.addData("green", green(pixel));
+        telemetry.addData("red", red(pixel));
+        telemetry.addData("green", green(pixel));
 
-        opMode.telemetry.addData("blue", blue(pixel));
-        opMode.telemetry.addData("Color", rgbImage.getColor(x, y));
+        telemetry.addData("blue", blue(pixel));
+        telemetry.addData("Color", rgbImage.getColor(x, y));
 
-        opMode.telemetry.update();
+        telemetry.update();
 
     }
 
