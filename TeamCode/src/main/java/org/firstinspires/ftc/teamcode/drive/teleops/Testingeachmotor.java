@@ -1,0 +1,78 @@
+package org.firstinspires.ftc.teamcode.drive.teleops;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name="MotorTest", group="teleop")
+public class Testingeachmotor extends LinearOpMode {
+    @Override
+    public void runOpMode() throws InterruptedException {
+        /*DcMotor fL = hardwareMap.dcMotor.get("fL");
+        DcMotor bL = hardwareMap.dcMotor.get("bL");
+        DcMotor fR = hardwareMap.dcMotor.get("fR");
+        DcMotor bR = hardwareMap.dcMotor.get("bR");
+
+
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        fR.setDirection(DcMotor.Direction.FORWARD);
+        bR.setDirection(DcMotor.Direction.FORWARD);
+        fL.setDirection(DcMotor.Direction.REVERSE);
+        bL.setDirection(DcMotor.Direction.FORWARD);
+
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);*/
+        Servo lO = hardwareMap.servo.get("lO");
+        Servo rO = hardwareMap.servo.get("rO");
+
+        waitForStart();
+
+        if (isStopRequested()) return;
+
+        while (opModeIsActive()) {
+
+            /*while(gamepad1.a) {
+                fL.setPower(1);
+                bL.setPower(1);
+                fR.setPower(1);
+                bR.setPower(1);
+            }
+            while(gamepad1.b){
+                fL.setPower(.5);
+                bL.setPower(.5);
+                fR.setPower(.5);
+                bR.setPower(.5);
+            }
+            while(gamepad1.y){
+                fL.setPower(.1);
+                bL.setPower(.1);
+                fR.setPower(.1);
+                bR.setPower(.1);
+            }
+            fL.setPower(0);
+            bL.setPower(0);
+            fR.setPower(0);
+            bR.setPower(0);*/
+            if (gamepad2.a) {
+                lO.setPosition(1);
+                rO.setPosition(0);
+            }
+            if (gamepad2.b) {
+                lO.setPosition(0);
+                rO.setPosition(1);
+            }
+
+
+        }
+    }
+
+}
