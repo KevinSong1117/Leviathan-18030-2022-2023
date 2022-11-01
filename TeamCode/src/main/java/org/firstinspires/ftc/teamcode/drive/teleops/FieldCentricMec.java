@@ -4,11 +4,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="mecanumDrive1", group="teleop")
-public class TestMecanum extends LinearOpMode {
+public class FieldCentricMec extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor fL = hardwareMap.dcMotor.get("fL");
@@ -59,10 +58,10 @@ public class TestMecanum extends LinearOpMode {
             double backRightPower = (rotY + rotX - rx) / denominator;
 
 
-            fL.setPower (.1);//(frontLeftPower);
-            bL.setPower (.1);//(backLeftPower);
-            fR.setPower (.1);//(frontRightPower);
-            bR.setPower (.1);//(backRightPower);
+            fL.setPower(frontLeftPower);
+            bL.setPower(backLeftPower);
+            fR.setPower(frontRightPower);
+            bR.setPower(backRightPower);
 
             if (gamepad1.a) {
                 lL.setPosition(1);

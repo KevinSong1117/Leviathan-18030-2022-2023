@@ -4,8 +4,10 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -26,6 +28,7 @@ public class Hardware {
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         fR.setDirection(DcMotor.Direction.FORWARD);
         bR.setDirection(DcMotor.Direction.FORWARD);

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="mecanumDrive2", group="teleop")
-public class TestMecanum2 extends LinearOpMode {
+public class RobotCentricMecV2 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor fL = hardwareMap.dcMotor.get("fL");
