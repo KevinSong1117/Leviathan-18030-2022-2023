@@ -46,9 +46,6 @@ public class Testing extends OpMode {
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
-        lL = hardwareMap.dcMotor.get("liftL"); // [E3]
-        rL = hardwareMap.dcMotor.get("liftR"); // [C3]
-
         lL.setDirection(DcMotorSimple.Direction.FORWARD);
         lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -96,7 +93,7 @@ public class Testing extends OpMode {
 
     @Override
     public void loop() {
-        double liftP = -gamepad2.left_stick_y;
+        double liftp = -gamepad2.left_stick_y;
         double y = -gamepad1.left_stick_y; // Remember, this is reversed!
         double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
         double rx = gamepad1.right_stick_x;
@@ -114,7 +111,8 @@ public class Testing extends OpMode {
         bL.setPower(backLeftPower);
         fR.setPower(frontRightPower);
         bR.setPower(backRightPower);
-
+        lL.setPower(liftp/3);
+        rL.setPower(liftp/3);
         if (gamepad2.x) {
             fI.setPower(.5);
             bI.setPower(.5);

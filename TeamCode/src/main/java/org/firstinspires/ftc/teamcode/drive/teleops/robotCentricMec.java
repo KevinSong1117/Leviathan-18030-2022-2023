@@ -36,7 +36,7 @@ public class robotCentricMec extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x;
+            double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
 
             double botHeading = -imu.getAngularOrientation().firstAngle;
