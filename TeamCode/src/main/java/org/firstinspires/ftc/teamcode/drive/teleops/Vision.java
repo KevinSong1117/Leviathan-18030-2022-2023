@@ -31,7 +31,7 @@ public class Vision extends LinearOpMode{
     public Vision(LinearOpMode opMode) throws InterruptedException{
         this.opMode = opMode;
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
-        params.vuforiaLicenseKey = "AQvLCbX/////AAABmTGnnsC2rUXvp1TAuiOSac0ZMvc3GKI93tFoRn4jPzB3uSMiwj75PNfUU6MaVsNZWczJYOep8LvDeM/3hf1+zO/3w31n1qJTtB2VHle8+MHWNVbNzXKLqfGSdvXK/wYAanXG2PBSKpgO1Fv5Yg27eZfIR7QOh7+J1zT1iKW/VmlsVSSaAzUSzYpfLufQDdE2wWQYrs8ObLq2kC37CeUlJ786gywyHts3Mv12fWCSdTH5oclkaEXsVC/8LxD1m+gpbRc2KC0BXnlwqwA2VqPSFU91vD8eCcD6t2WDbn0oJas31PcooBYWM6UgGm9I2plWazlIok72QG/kOYDh4yXOT4YXp1eYh864e8B7mhM3VclQ";
+        params.vuforiaLicenseKey = "AeYdBDf/////AAABmQTuBZOhz0bRuAsAOwxGPfNN1HwhR1DVfpt9k7Gj6MnpFCjkQCrgdnoYMMN1cSd3cpoQkWqmfSg+2a8OE8sTQR4A7wO4cVmyDilb29WXtggQAUaicXlrfJPOCvTovN5QIV0bhPuqE7mBACUBBAapP9KYCTqovR218Z6J6Fc3NYh5PR0ez8WdfCu3tKw/McP99K5GzQRVOaFDCzuSXMlchYSAxHP0AqfOSd2MRn9xMW48UQPMPhdQS+I4sJ9pt/q3K4Aj1x7ttSo3YJbgwbeDr3VNM2qcmm8LmIXEU/jKRom3TNG14iPWB4Po0QdUuOBAcSPJsVGJMG/cUBRNgvyGDc9DGPez/BrC8p5juRzbMV1P";
         params.cameraName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
         vuforia = ClassFactory.getInstance().createVuforia(params);
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true); //enables RGB565 format for the image
