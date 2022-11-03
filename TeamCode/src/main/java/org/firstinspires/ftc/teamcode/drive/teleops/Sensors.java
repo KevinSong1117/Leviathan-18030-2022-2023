@@ -1,60 +1,49 @@
 package org.firstinspires.ftc.teamcode.drive.teleops;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.Locale;
 
-public class TurnPIDController {
-    Orientation angles;
-
+public class Sensors
+{
     public BNO055IMU gyro;
-    private double targetAngle;
-    private double kP, kD, kI;
-    private double acculumatedError = 0;
-    private ElapsedTime timer = new ElapsedTime();
-    private double lastError = 0;
-    private double lastTime = 0;
+    LinearOpMode opMode;
+    Orientation angles;
+    BNO055IMU.Parameters parameters;
 
-    public TurnPIDController(double target, double p, double i, double d){
-        targetAngle = target;
-        kP = p;
-        kI = i;
-        kD = d;
+    public Sensors(LinearOpMode opMode){
+        this.opMode = opMode;
+        opMode.telemetry.addLine("initializing imu, please wait");
+        opMode.telemetry.speak("initializing imu, please wait");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        gyro = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        gyro.initialize(parameters);
+        opMode.telemetry.addLine("initialization complete");
+        opMode.telemetry.speak("initialization complete");
     }
 
-    public double update(double currentAngle){
-        //P
-        double error = targetAngle - currentAngle;
-        error %= 360;
-        error += 360;
-        error %= 360;
-        if(error > 180){
-            error -= 360;
-        }
-        //I
-        acculumatedError += error;
-        if(Math.abs(error) < 2){
-            acculumatedError = 0;
-        }
-        acculumatedError = Math.abs(acculumatedError) * Math.signum(error);
-
-        //D
-        double slope = 0;
-        if (lastTime > 0){
-            slope = (error - lastError) / (timer.milliseconds() - lastTime);
-        }
-        lastTime = timer.milliseconds();
-        lastError = error;
-
-        //Motor power calculation
-
-        double motorPower = .1 * Math.signum(error) + 0.9 * Math.tanh( kP * error + kI * acculumatedError + kD * slope);
-
-        return motorPower;
+    public Sensors(OpMode opMode){
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        gyro = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+        gyro.initialize(parameters);
     }
     public void updateAngle() {
         angles = gyro.getAngularOrientation();
@@ -105,5 +94,4 @@ public class TurnPIDController {
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
-
 }

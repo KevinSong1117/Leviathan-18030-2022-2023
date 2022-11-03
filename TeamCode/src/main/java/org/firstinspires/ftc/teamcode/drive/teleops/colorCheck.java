@@ -16,11 +16,12 @@ public class colorCheck extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         vision = new Vision((this));
-        while(!isStarted()){
+        while (!isStarted() && !isStopRequested()){
             vision.gettrueColor(330, 240);
         }
-
+        waitForStart();
         //IF THE WRIST EVER POINTS DOWN, YOU ARE BONED. GG. UNLUCKY
+
 
     }
 }

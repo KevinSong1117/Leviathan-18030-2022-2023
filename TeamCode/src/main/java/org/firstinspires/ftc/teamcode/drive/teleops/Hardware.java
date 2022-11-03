@@ -53,4 +53,35 @@ public class Hardware {
         bR.setPower(p4);
     }
     public void setAllPower(double p){setMotorPower(p,p,p,p);}
+    public void resetEncoder() {
+        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public double getTic() {
+        double count = 4;
+        if (fR.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (fL.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (bR.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (bL.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        double totaldis = Math.abs(fR.getCurrentPosition()) + Math.abs(fL.getCurrentPosition()) + Math.abs(bL.getCurrentPosition()) + Math.abs(bR.getCurrentPosition());
+        if (count == 0) {
+            return 1;
+        }
+        return totaldis / count;
+    }
 }

@@ -27,12 +27,8 @@ public class Vision extends LinearOpMode{
 
     LinearOpMode opMode;
     VuforiaLocalizer vuforia;
-    String pos = "notFound";
-    int spot1 = 0;
-    int spot2 = 0;
-    int spot3 = 0;
 
-    public Vision(LinearOpMode opMode){
+    public Vision(LinearOpMode opMode) throws InterruptedException{
         this.opMode = opMode;
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
         params.vuforiaLicenseKey = "AQvLCbX/////AAABmTGnnsC2rUXvp1TAuiOSac0ZMvc3GKI93tFoRn4jPzB3uSMiwj75PNfUU6MaVsNZWczJYOep8LvDeM/3hf1+zO/3w31n1qJTtB2VHle8+MHWNVbNzXKLqfGSdvXK/wYAanXG2PBSKpgO1Fv5Yg27eZfIR7QOh7+J1zT1iKW/VmlsVSSaAzUSzYpfLufQDdE2wWQYrs8ObLq2kC37CeUlJ786gywyHts3Mv12fWCSdTH5oclkaEXsVC/8LxD1m+gpbRc2KC0BXnlwqwA2VqPSFU91vD8eCcD6t2WDbn0oJas31PcooBYWM6UgGm9I2plWazlIok72QG/kOYDh4yXOT4YXp1eYh864e8B7mhM3VclQ";
@@ -40,6 +36,7 @@ public class Vision extends LinearOpMode{
         vuforia = ClassFactory.getInstance().createVuforia(params);
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true); //enables RGB565 format for the image
         vuforia.setFrameQueueCapacity(4); //tells VuforiaLocalizer to only store one frame at a time
+        vuforia.enableConvertFrameToBitmap();
     }
 
     public Bitmap getImage() throws InterruptedException {
@@ -57,38 +54,6 @@ public class Vision extends LinearOpMode{
         Bitmap bm = Bitmap.createBitmap(rgb.getWidth(), rgb.getHeight(), Bitmap.Config.RGB_565);
         bm.copyPixelsFromBuffer(rgb.getPixels());
         return bm;
-    }
-    public String redCTSE() throws InterruptedException {
-        Bitmap rgbImage = getImage();
-        spot1 = 0;
-        spot2 = 0;
-        spot3 = 0;
-        for(int i = 88; i < 140; i++){
-            if(isGreen(rgbImage.getPixel(29,i))) {
-                spot3 += 1;
-            }
-        }
-        for(int i = 88; i < 140; i++){
-            if(isGreen(rgbImage.getPixel(312,i))) {
-                spot2 += 1;
-            }
-        }
-        for(int i = 88; i < 140; i++){
-            if(isGreen(rgbImage.getPixel(612,i))) {
-                spot1 += 1;
-            }
-        }
-        if(spot1 > spot2 && spot1 > spot3)
-            pos = "1";
-        else if(spot2 > spot3)
-            pos = "2";
-        else
-            pos = "3";
-        opMode.telemetry.addData("spot 1", spot1);
-        opMode.telemetry.addData("spot 2", spot2);
-        opMode.telemetry.addData("spot 3", spot3);
-        telemetry.update();
-        return pos;
     }
 
     public boolean isGreen(int pixel) {

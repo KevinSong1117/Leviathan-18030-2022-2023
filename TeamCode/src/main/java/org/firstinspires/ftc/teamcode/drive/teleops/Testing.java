@@ -238,6 +238,8 @@ public class Testing extends OpMode {
         telemetry.addData("FR encoder value:", fR.getCurrentPosition());
         telemetry.addData("BL encoder value:", bL.getCurrentPosition());
         telemetry.addData("BR encoder value:", bR.getCurrentPosition());
+        telemetry.addData("rL encoder value:", rL.getCurrentPosition());
+        telemetry.addData("lL encoder valye:", lL.getCurrentPosition());
         telemetry.update();
     }
 }
