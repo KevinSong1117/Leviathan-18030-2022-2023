@@ -109,13 +109,16 @@ public class testingAuto extends LinearOpMode
         bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void startMotors(double right, double left) {
-        fR.setPower(right);
-        fL.setPower(left);
-        bL.setPower(left);
-        bR.setPower(right);
-        telemetry.addData("right power", right);
-        telemetry.addData("left power", left);
+    public void startMotors(double fl, double fr, double bl, double br) {
+        fR.setPower(fr);
+        fL.setPower(fl);
+        bL.setPower(bl);
+        bR.setPower(br);
+
+        telemetry.addData("fl", fl);
+        telemetry.addData("fr", fr);
+        telemetry.addData("bl", bl);
+        telemetry.addData("br", br);
         telemetry.update();
     }
     public void stopMotors() {
@@ -205,28 +208,111 @@ public class testingAuto extends LinearOpMode
 
             if (difference > .4){
                 if (power > 0) {
-                    startMotors((power + f), (power + f) * .8);
+                    startMotors((power + f), (power + f), (power + f), (power + f));
                 }
                 else {
-                    startMotors((power - f) * .8, (power - f));
+                    startMotors((power - f), (power - f),(power - f),(power - f));
                 }
             }
             else if(difference < -.5){
                 if (power > 0) {
-                    startMotors((power + f), (power + f));
+                    startMotors((power + f), (power + f),(power + f),(power + f));
                 }
                 else {
-                    startMotors((power - f),(power - f));
+                    startMotors((power - f),(power - f),(power - f),(power - f));
                 }
             }
             else{
                 if (power > 0) {
-                    startMotors(power + f,  power + f);
+                    startMotors(power + f,  power + f,power + f,power + f);
                 }
                 else {
-                    startMotors(power - f,power - f);
+                    startMotors(power - f,power - f,power - f,power - f);
                 }
             }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+    public void strafePIDGyro(double kp, double ki, double kd, double f, double inches, double threshold, double time){
+        timer.reset();
+        resetEncoder();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+
+        double initialError = Math.abs(inches); //-20
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested()) {
+            if (inches < 0){
+                error = inches + getTic() / COUNTS_PER_INCH;
+            }
+            else{
+                error = inches - getTic() / COUNTS_PER_INCH;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            double difference = gyro.angleDiff(initialHeading);
+
+            if (difference > .5){
+                if (power > 0) {
+                    startMotors(.8 * (power + f), .8 * (-power - f), 1.2 * (-power - f), 1.2 * (power + f));
+
+                }
+                else {
+                    startMotors(1.2 * (power - f), 1.2 * (-power + f), .8 * (-power + f), .8 * (power - f));
+                }
+            }
+            else if(difference < -.5){
+                if (power > 0) {
+                    startMotors(1.2 * (power + f), 1.2 * (-power - f), .8 * (-power - f), .8 * (power + f));
+
+                }
+                else {
+                    startMotors(.8 * (power - f), .8 * (-power + f), 1.2 * (-power + f), 1.2 * (power - f));
+                }
+            }
+            else{
+                if (power > 0) {
+                    startMotors(power + f, -power - f, -power - f, power + f);
+
+                }
+                else {
+                    startMotors(power - f, -power + f, -power + f, power - f);
+                }
+            }
+
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
                     atSetpoint = true;
@@ -279,13 +365,13 @@ public class testingAuto extends LinearOpMode
                 if (Math.abs(kp) < .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors(-power - f, power + f);
+                startMotors(-power - f,-power - f, power + f,power + f);
             }
             else{
                 if (Math.abs(kp) > .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors(-power + f, power - f);
+                startMotors(-power + f,-power + f, power - f,power - f);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){

@@ -25,7 +25,7 @@ public class Testingeachmotor extends LinearOpMode {
         DcMotor bR = hardwareMap.dcMotor.get("bR");
         DcMotor lI = hardwareMap.dcMotor.get("lI");
         DcMotor rI = hardwareMap.dcMotor.get("rI");
-        Vision vision;
+
         CRServo fI = hardwareMap.get(CRServo.class, "fI");
         CRServo bI = hardwareMap.get(CRServo.class, "bI");
 
@@ -45,7 +45,7 @@ public class Testingeachmotor extends LinearOpMode {
 
         Servo lO = hardwareMap.servo.get("lO");
         Servo rO = hardwareMap.servo.get("rO");
-        vision = new Vision((this));
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -93,9 +93,12 @@ public class Testingeachmotor extends LinearOpMode {
             if(gamepad2.left_bumper){
                 lI.setPower(-.5);
                 rI.setPower(.5);
-            }else{lI.setPower(0);
-                rI.setPower(0);}
-            vision.gettrueColor(330, 240);
+            }
+            else{
+                lI.setPower(0);
+                rI.setPower(0);
+            }
+
 
             telemetry.addData("FL encoder value:", fL.getCurrentPosition());
             telemetry.addData("FR encoder value:", fR.getCurrentPosition());

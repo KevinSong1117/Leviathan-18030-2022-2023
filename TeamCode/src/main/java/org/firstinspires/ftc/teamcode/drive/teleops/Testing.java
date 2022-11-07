@@ -111,6 +111,7 @@ public class Testing extends OpMode {
         bL.setPower(backLeftPower);
         fR.setPower(frontRightPower);
         bR.setPower(backRightPower);
+
         lL.setPower(liftp/3);
         rL.setPower(liftp/3);
         if (gamepad2.x) {
