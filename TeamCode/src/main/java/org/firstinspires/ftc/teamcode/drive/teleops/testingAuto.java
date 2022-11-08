@@ -70,9 +70,9 @@ public class testingAuto extends LinearOpMode
         gyro = new Sensors(this);
 
         fR.setDirection(DcMotor.Direction.FORWARD);
+        bR.setDirection(DcMotor.Direction.FORWARD);
         fL.setDirection(DcMotor.Direction.REVERSE);
-        bR.setDirection(DcMotor.Direction.REVERSE);
-        bL.setDirection(DcMotor.Direction.REVERSE);
+        bL.setDirection(DcMotor.Direction.FORWARD);
 
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -85,7 +85,12 @@ public class testingAuto extends LinearOpMode
         bL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         waitForStart();
-        movePIDFGyro(25,.3,0,0,.15,.2,.5);
+        //movePIDFGyro(30,1,0,0,.15,.3,.5);
+        //strafePIDGyro(.3,0,0,.15,15,.3,.5);
+        turnHeading(-90, 0, 0, 0, .3, .5, .5);
+        turnLeft(90, 0, 0, 0, -.3, .5, .5);
+        telemetry.addData("FirstAngle", gyro.getAngle());
+        telemetry.update();
     }
 
     public void deliverA(String level){
@@ -206,7 +211,7 @@ public class testingAuto extends LinearOpMode
 
             double difference = gyro.angleDiff(initialHeading);
 
-            if (difference > .4){
+            if (difference > .6){
                 if (power > 0) {
                     startMotors((power + f), (power + f), (power + f), (power + f));
                 }
@@ -214,7 +219,7 @@ public class testingAuto extends LinearOpMode
                     startMotors((power - f), (power - f),(power - f),(power - f));
                 }
             }
-            else if(difference < -.5){
+            else if(difference < -.6){
                 if (power > 0) {
                     startMotors((power + f), (power + f),(power + f),(power + f));
                 }
@@ -287,20 +292,20 @@ public class testingAuto extends LinearOpMode
 
             if (difference > .5){
                 if (power > 0) {
-                    startMotors(.8 * (power + f), .8 * (-power - f), 1.2 * (-power - f), 1.2 * (power + f));
+                    startMotors((power + f), (-power - f), (-power - f), (power + f));
 
                 }
                 else {
-                    startMotors(1.2 * (power - f), 1.2 * (-power + f), .8 * (-power + f), .8 * (power - f));
+                    startMotors((power - f), (-power + f), (-power + f), (power - f));
                 }
             }
             else if(difference < -.5){
                 if (power > 0) {
-                    startMotors(1.2 * (power + f), 1.2 * (-power - f), .8 * (-power - f), .8 * (power + f));
+                    startMotors((power + f), (-power - f), (-power - f), (power + f));
 
                 }
                 else {
-                    startMotors(.8 * (power - f), .8 * (-power + f), 1.2 * (-power + f), 1.2 * (power - f));
+                    startMotors((power - f), (-power + f), (-power + f), (power - f));
                 }
             }
             else{
@@ -332,6 +337,64 @@ public class testingAuto extends LinearOpMode
         stopMotors();
     }
 
+    public void turnLeft(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+        timer.reset();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+        finalAngle = angleWrapDeg(finalAngle);
+
+        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
+        double error = initialAngleDiff;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / Math.abs(initialAngleDiff);
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            if (power > 0) {
+                if (Math.abs(kp) < .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power - f)*.8,(power + f)*.8, -power - f,power + f);
+            }
+            else{
+                if (Math.abs(kp) > .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
     public void turnHeading(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
         timer.reset();
 
@@ -365,13 +428,13 @@ public class testingAuto extends LinearOpMode
                 if (Math.abs(kp) < .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors(-power - f,-power - f, power + f,power + f);
+                startMotors((power + f)*.8,(-power - f)*.8, power + f,-power - f);
             }
             else{
                 if (Math.abs(kp) > .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors(-power + f,-power + f, power - f,power - f);
+                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){

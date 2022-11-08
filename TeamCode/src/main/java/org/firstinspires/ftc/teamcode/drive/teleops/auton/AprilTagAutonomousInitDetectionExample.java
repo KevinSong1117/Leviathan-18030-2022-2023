@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.drive.teleops.auton;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.drive.teleops.Sensors;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -11,9 +15,21 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@TeleOp
+@Autonomous
 public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 {
+    // Declare OpMode members.
+    public DcMotor fL;
+    public DcMotor fR;
+    public DcMotor bL;  // instantiates motor variables
+    public DcMotor bR;
+    Sensors gyro;
+    ElapsedTime timer;
+    static final double COUNTS_PER_MOTOR_REV = 537.7;
+    static final double DRIVE_GEAR_REDUCTION = 1.0;
+    static final double WHEEL_DIAMETER_INCHES = 4.0;
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -35,6 +51,28 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
     @Override
     public void runOpMode()
     {
+        timer = new ElapsedTime();
+        fL = hardwareMap.get(DcMotor.class, "fL");
+        fR = hardwareMap.get(DcMotor.class, "fR");
+        bL = hardwareMap.get(DcMotor.class, "bL");
+        bR = hardwareMap.get(DcMotor.class, "bR");
+
+        gyro = new Sensors(this);
+
+        fR.setDirection(DcMotor.Direction.FORWARD);
+        bR.setDirection(DcMotor.Direction.FORWARD);
+        fL.setDirection(DcMotor.Direction.REVERSE);
+        bL.setDirection(DcMotor.Direction.FORWARD);
+
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        fR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        fL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        bR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        bL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -140,15 +178,370 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         // Actually do something useful
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            //trajectory
+            movePIDFGyro(40,1,0,0,.15,.3,.5);
+            turnLeft(-90, 0, 0, 0, .3, .5, .5);
+            movePIDFGyro(30,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == MIDDLE){
-            //trajectory
+            movePIDFGyro(40,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == RIGHT){
-            //trajectory
+            movePIDFGyro(40,1,0,0,.15,.3,.5);
+            turnLeft(90, 0, 0, 0, -.3, .5, .5);
+            movePIDFGyro(30,1,0,0,.15,.3,.5);
         }
 
 
         while (opModeIsActive()) {sleep(20);}
+    }
+
+    public void resetEncoder() {
+        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public void startMotors(double fl, double fr, double bl, double br) {
+        fR.setPower(fr);
+        fL.setPower(fl);
+        bL.setPower(bl);
+        bR.setPower(br);
+
+        telemetry.addData("fl", fl);
+        telemetry.addData("fr", fr);
+        telemetry.addData("bl", bl);
+        telemetry.addData("br", br);
+        telemetry.update();
+    }
+    public void stopMotors() {
+        fR.setPower(0);
+        fL.setPower(0);
+        bR.setPower(0);
+        bL.setPower(0);
+    }
+    public double getTic() {
+        double count = 4;
+        if (fR.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (fL.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (bR.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (bL.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        double totaldis = Math.abs(fR.getCurrentPosition()) + Math.abs(fL.getCurrentPosition()) + Math.abs(bL.getCurrentPosition()) + Math.abs(bR.getCurrentPosition());
+        if (count == 0) {
+            return 1;
+        }
+        return totaldis / count;
+    }
+    public double angleDiffSigma(double angle1, double angle2)
+    {
+        return angleWrapDeg(angle2 - angle1);
+    }
+
+    public double angleWrapDeg(double angle)
+    {
+        double zeroTo360 = angle + 180;      //convert to 0-360
+        double start = (zeroTo360 % 360); //will work for positive angles
+        //angle is (-360, 0), add 360 to make it from 0-360
+        if (start < 0)
+        {
+            start += 360;
+        }
+        return start - 180; //bring it back to -180 to 180
+    }
+
+    public void movePIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){
+        timer.reset();
+        resetEncoder();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+
+        double initialError = Math.abs(inches); //-20
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            telemetry.addData("angle", gyro.getAngle());
+            telemetry.update();
+
+            if (inches < 0){
+                error = inches + getTic() / COUNTS_PER_INCH;
+            }
+            else{
+                error = inches - getTic() / COUNTS_PER_INCH;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+
+            double difference = gyro.angleDiff(initialHeading);
+
+            if (difference > .6){
+                if (power > 0) {
+                    startMotors((power + f), (power + f), (power + f), (power + f));
+                }
+                else {
+                    startMotors((power - f), (power - f),(power - f),(power - f));
+                }
+            }
+            else if(difference < -.6){
+                if (power > 0) {
+                    startMotors((power + f), (power + f),(power + f),(power + f));
+                }
+                else {
+                    startMotors((power - f),(power - f),(power - f),(power - f));
+                }
+            }
+            else{
+                if (power > 0) {
+                    startMotors(power + f,  power + f,power + f,power + f);
+                }
+                else {
+                    startMotors(power - f,power - f,power - f,power - f);
+                }
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+    public void strafePIDGyro(double kp, double ki, double kd, double f, double inches, double threshold, double time){
+        timer.reset();
+        resetEncoder();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+
+        double initialError = Math.abs(inches); //-20
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested()) {
+            if (inches < 0){
+                error = inches + getTic() / COUNTS_PER_INCH;
+            }
+            else{
+                error = inches - getTic() / COUNTS_PER_INCH;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            double difference = gyro.angleDiff(initialHeading);
+
+            if (difference > .5){
+                if (power > 0) {
+                    startMotors((power + f), (-power - f), (-power - f), (power + f));
+
+                }
+                else {
+                    startMotors((power - f), (-power + f), (-power + f), (power - f));
+                }
+            }
+            else if(difference < -.5){
+                if (power > 0) {
+                    startMotors((power + f), (-power - f), (-power - f), (power + f));
+
+                }
+                else {
+                    startMotors((power - f), (-power + f), (-power + f), (power - f));
+                }
+            }
+            else{
+                if (power > 0) {
+                    startMotors(power + f, -power - f, -power - f, power + f);
+
+                }
+                else {
+                    startMotors(power - f, -power + f, -power + f, power - f);
+                }
+            }
+
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+
+    public void turnLeft(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+        timer.reset();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+        finalAngle = angleWrapDeg(finalAngle);
+
+        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
+        double error = initialAngleDiff;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / Math.abs(initialAngleDiff);
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            if (power > 0) {
+                if (Math.abs(kp) < .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power - f)*.8,(power + f)*.8, -power - f,power + f);
+            }
+            else{
+                if (Math.abs(kp) > .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+    public void turnHeading(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+        timer.reset();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+        finalAngle = angleWrapDeg(finalAngle);
+
+        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
+        double error = initialAngleDiff;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / Math.abs(initialAngleDiff);
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            if (power > 0) {
+                if (Math.abs(kp) < .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((power + f)*.8,(-power - f)*.8, power + f,-power - f);
+            }
+            else{
+                if (Math.abs(kp) > .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
     }
 
     void tagToTelemetry(AprilTagDetection detection)
