@@ -178,15 +178,15 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         // Actually do something useful
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            movePIDFGyro(40,1,0,0,.15,.3,.5);
+            movePIDFGyro(27,1,0,0,.15,.3,.5);
             turnLeft(-90, 0, 0, 0, .3, .5, .5);
-            movePIDFGyro(30,1,0,0,.15,.3,.5);
+            movePIDFGyro(21,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == MIDDLE){
-            movePIDFGyro(40,1,0,0,.15,.3,.5);
+            movePIDFGyro(27,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == RIGHT){
-            movePIDFGyro(40,1,0,0,.15,.3,.5);
+            movePIDFGyro(27,1,0,0,.15,.3,.5);
             turnLeft(90, 0, 0, 0, -.3, .5, .5);
-            movePIDFGyro(30,1,0,0,.15,.3,.5);
+            movePIDFGyro(21,1,0,0,.15,.3,.5);
         }
 
 
