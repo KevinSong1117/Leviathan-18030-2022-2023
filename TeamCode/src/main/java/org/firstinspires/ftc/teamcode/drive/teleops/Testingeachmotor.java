@@ -79,8 +79,8 @@ public class Testingeachmotor extends LinearOpMode {
                 bI.setPower(0);}
 
             double liftp = -gamepad2.left_stick_y;
-            lL.setPower(liftp/2);
-            rL.setPower(liftp/2);
+            lL.setPower(liftp/1.3);
+            rL.setPower(liftp/1.3);
             if (gamepad2.a) {
                 lO.setPosition(1);
                 rO.setPosition(0);

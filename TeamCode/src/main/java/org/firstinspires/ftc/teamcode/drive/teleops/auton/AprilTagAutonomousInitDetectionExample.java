@@ -188,8 +188,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             lI.setPower(0);
             rI.setPower(0);
             sleep(500);
-            turnLeft(-90, 0, 0, 0, .35, .5, .5);
-            movePIDFGyro(24,1,0,0,.15,.3,.5);
+            turnLeft(-88, 0, 0, 0, .34, .5, .5);
+            movePIDFGyro(26,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == MIDDLE){
             movePIDFGyro(28,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == RIGHT){
@@ -199,8 +199,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             lI.setPower(0);
             rI.setPower(0);
             sleep(500);
-            turnLeft(90, 0, 0, 0, -.35, .5, .5);
-            movePIDFGyro(24,1,0,0,.15,.3,.5);
+            turnLeft(88, 0, 0, 0, -.34, .5, .5);
+            movePIDFGyro(26,1,0,0,.15,.3,.5);
 
         }
 
