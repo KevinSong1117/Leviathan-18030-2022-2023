@@ -64,15 +64,15 @@ public class Testingeachmotor extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
-            fL.setPower(frontLeftPower*.7);
-            bL.setPower(backLeftPower*.7);
+            fL.setPower(frontLeftPower);
+            bL.setPower(backLeftPower);
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
 
-            if (gamepad2.x) {
+            if (gamepad2.left_bumper) {
                 fI.setPower(1);
                 bI.setPower(-1);
-            }else if (gamepad2.y) {
+            }else if (gamepad2.right_bumper) {
                 fI.setPower(-1);
                 bI.setPower(1);
             }else{fI.setPower(0);
@@ -89,12 +89,13 @@ public class Testingeachmotor extends LinearOpMode {
                 lO.setPosition(0);
                 rO.setPosition(1);
             }
+            
             if(gamepad1.left_bumper){
-                lI.setPower(-.3);
-                rI.setPower(.3);
+                lI.setPower(-.4);
+                rI.setPower(.4);
             }else if(gamepad1.right_bumper)
-            {   lI.setPower(.3);
-                rI.setPower(-.3);}
+            {   lI.setPower(.4);
+                rI.setPower(-.4);}
             else{lI.setPower(0);
                 rI.setPower(0);}
 

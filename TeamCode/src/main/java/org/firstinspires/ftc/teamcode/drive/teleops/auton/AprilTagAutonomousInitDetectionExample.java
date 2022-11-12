@@ -23,6 +23,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
     public DcMotor fR;
     public DcMotor bL;  // instantiates motor variables
     public DcMotor bR;
+    public DcMotor lI;
+    public DcMotor rI;
     Sensors gyro;
     ElapsedTime timer;
     static final double COUNTS_PER_MOTOR_REV = 537.7;
@@ -56,6 +58,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         fR = hardwareMap.get(DcMotor.class, "fR");
         bL = hardwareMap.get(DcMotor.class, "bL");
         bR = hardwareMap.get(DcMotor.class, "bR");
+        lI = hardwareMap.get(DcMotor.class, "lI");
+        rI = hardwareMap.get(DcMotor.class, "rI");
 
         gyro = new Sensors(this);
 
@@ -178,15 +182,26 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         // Actually do something useful
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            movePIDFGyro(27,1,0,0,.15,.3,.5);
-            turnLeft(-90, 0, 0, 0, .3, .5, .5);
-            movePIDFGyro(21,1,0,0,.15,.3,.5);
+            lI.setPower(.4);
+            rI.setPower(-.4);
+            movePIDFGyro(28,1,0,0,.15,.3,.5);
+            lI.setPower(0);
+            rI.setPower(0);
+            sleep(500);
+            turnLeft(-90, 0, 0, 0, .35, .5, .5);
+            movePIDFGyro(24,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == MIDDLE){
-            movePIDFGyro(27,1,0,0,.15,.3,.5);
+            movePIDFGyro(28,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == RIGHT){
-            movePIDFGyro(27,1,0,0,.15,.3,.5);
-            turnLeft(90, 0, 0, 0, -.3, .5, .5);
-            movePIDFGyro(21,1,0,0,.15,.3,.5);
+            lI.setPower(.4);
+            rI.setPower(-.4);
+            movePIDFGyro(28,1,0,0,.15,.3,.5);
+            lI.setPower(0);
+            rI.setPower(0);
+            sleep(500);
+            turnLeft(90, 0, 0, 0, -.35, .5, .5);
+            movePIDFGyro(24,1,0,0,.15,.3,.5);
+
         }
 
 
