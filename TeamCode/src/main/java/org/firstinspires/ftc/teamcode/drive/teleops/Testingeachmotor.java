@@ -69,6 +69,7 @@ public class Testingeachmotor extends LinearOpMode {
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
 
+
             if (gamepad2.left_bumper) {
                 fI.setPower(1);
                 bI.setPower(-1);
