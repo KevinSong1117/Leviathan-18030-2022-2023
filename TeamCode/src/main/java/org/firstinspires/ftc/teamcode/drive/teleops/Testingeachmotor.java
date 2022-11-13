@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="MotorTest", group="teleop")
 public class Testingeachmotor extends LinearOpMode {
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor lL = hardwareMap.dcMotor.get("lL");
@@ -69,7 +68,12 @@ public class Testingeachmotor extends LinearOpMode {
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
 
-
+            if(gamepad1.left_trigger > .1){
+                fL.setPower(frontLeftPower*.5);
+                bL.setPower(backLeftPower*.5);
+                fR.setPower(frontRightPower*.5);
+                bR.setPower(backRightPower*.5);
+            }
             if (gamepad2.left_bumper) {
                 fI.setPower(1);
                 bI.setPower(-1);
@@ -90,7 +94,6 @@ public class Testingeachmotor extends LinearOpMode {
                 lO.setPosition(0);
                 rO.setPosition(1);
             }
-            
             if(gamepad1.left_bumper){
                 lI.setPower(-.4);
                 rI.setPower(.4);
@@ -100,11 +103,11 @@ public class Testingeachmotor extends LinearOpMode {
             else{lI.setPower(0);
                 rI.setPower(0);}
 
-
             telemetry.addData("FL encoder value:", fL.getCurrentPosition());
             telemetry.addData("FR encoder value:", fR.getCurrentPosition());
             telemetry.addData("BL encoder value:", bL.getCurrentPosition());// this is negative for some reason
             telemetry.addData("BR encoder value:", bR.getCurrentPosition());
+            telemetry.addData("Gamepad1 trigger", gamepad1.left_trigger);
             telemetry.update();
 
         }
