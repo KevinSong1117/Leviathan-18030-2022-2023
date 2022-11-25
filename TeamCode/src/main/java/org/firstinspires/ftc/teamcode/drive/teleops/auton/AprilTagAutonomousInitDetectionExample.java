@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.drive.teleops.auton;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import  com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
 import org.firstinspires.ftc.teamcode.drive.teleops.Sensors;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -23,8 +24,10 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
     public DcMotor fR;
     public DcMotor bL;  // instantiates motor variables
     public DcMotor bR;
-    public DcMotor lI;
-    public DcMotor rI;
+
+    public DcMotor rL;
+    public DcMotor lL;
+
     Sensors gyro;
     ElapsedTime timer;
     static final double COUNTS_PER_MOTOR_REV = 537.7;
@@ -58,10 +61,13 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         fR = hardwareMap.get(DcMotor.class, "fR");
         bL = hardwareMap.get(DcMotor.class, "bL");
         bR = hardwareMap.get(DcMotor.class, "bR");
-        lI = hardwareMap.get(DcMotor.class, "lI");
-        rI = hardwareMap.get(DcMotor.class, "rI");
+
+        lL = hardwareMap.get(DcMotor.class, "lL");
+        rL = hardwareMap.get(DcMotor.class, "rL");
 
         gyro = new Sensors(this);
+        lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         fR.setDirection(DcMotor.Direction.FORWARD);
         bR.setDirection(DcMotor.Direction.FORWARD);
@@ -181,25 +187,33 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
 
         // Actually do something useful
+        movePIDFGyro(-28,1,0,0,.15,.3,.5);
+
+
+        int height = 200;
+        for (int i = 0; i < 1; i++) {
+            turnLeft(-15, 0, 0, 0, .34, .5, .5);
+            lift(2700);
+            //horizontal slide
+            //claw release
+            //horizontal slide
+            lift(height);
+            turnLeft(88, 0, 0, 0, -.34, .5, .5);
+            movePIDFGyro(15, 1, 0, 0, .15, .3, .5);
+            // tight claw
+            movePIDFGyro(-15, 1, 0, 0, .15, .3, .5);
+            height -= 50;
+        }
+        turnLeft(180, 0, 0, 0, .34, .5, .5);
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            lI.setPower(.4);
-            rI.setPower(-.4);
             movePIDFGyro(28,1,0,0,.15,.3,.5);
-            lI.setPower(0);
-            rI.setPower(0);
-            sleep(500);
-            turnLeft(-88, 0, 0, 0, .34, .5, .5);
+            turnLeft(88, 0, 0, 0, -.34, .5, .5);
             movePIDFGyro(26,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == MIDDLE){
             movePIDFGyro(28,1,0,0,.15,.3,.5);
         }else if(tagOfInterest.id == RIGHT){
-            lI.setPower(.4);
-            rI.setPower(-.4);
             movePIDFGyro(28,1,0,0,.15,.3,.5);
-            lI.setPower(0);
-            rI.setPower(0);
-            sleep(500);
-            turnLeft(88, 0, 0, 0, -.34, .5, .5);
+            turnLeft(-88, 0, 0, 0, .34, .5, .5);
             movePIDFGyro(26,1,0,0,.15,.3,.5);
 
         }
@@ -272,6 +286,28 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             start += 360;
         }
         return start - 180; //bring it back to -180 to 180
+    }
+
+    public void setLiftPower(double power){
+        rL.setPower(power);
+        lL.setPower(power);
+    }
+    public double getLiftPosition(){
+        return (lL.getCurrentPosition() + rL.getCurrentPosition()) /2;
+    }
+    public void lift(double targetPos){
+        if (getLiftPosition() < targetPos) {
+            while (getLiftPosition() < targetPos) {
+                lL.setPower(.6);
+                rL.setPower(.6);
+            }
+        }
+        else {
+            while (getLiftPosition() > targetPos) {
+                lL.setPower(-.6);
+                rL.setPower(-.6);
+            }
+        }
     }
 
     public void movePIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){

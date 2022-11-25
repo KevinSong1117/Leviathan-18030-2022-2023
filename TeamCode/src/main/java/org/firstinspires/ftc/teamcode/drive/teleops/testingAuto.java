@@ -51,13 +51,15 @@ public class testingAuto extends LinearOpMode
     public DcMotor fR;
     public DcMotor bL;  // instantiates motor variables
     public DcMotor bR;
+    public DcMotor lL;
+    public DcMotor rL;
     Sensors gyro;
     ElapsedTime timer;
     static final double COUNTS_PER_MOTOR_REV = 537.7;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
-    static final double WHEEL_DIAMETER_INCHES = 4.0;
+    static final double WHEEL_DIAMETER_INCHES = 3.77953;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
+            (WHEEL_DIAMETER_INCHES * Math.PI);
 
     @Override
     public void runOpMode() throws InterruptedException  {
@@ -66,8 +68,12 @@ public class testingAuto extends LinearOpMode
         fR = hardwareMap.get(DcMotor.class, "fR");
         bL = hardwareMap.get(DcMotor.class, "bL");
         bR = hardwareMap.get(DcMotor.class, "bR");
+        lL = hardwareMap.get(DcMotor.class, "lL");
+        rL = hardwareMap.get(DcMotor.class, "rL");
 
         gyro = new Sensors(this);
+        lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         fR.setDirection(DcMotor.Direction.FORWARD);
         bR.setDirection(DcMotor.Direction.FORWARD);
@@ -87,8 +93,8 @@ public class testingAuto extends LinearOpMode
         waitForStart();
         //movePIDFGyro(30,1,0,0,.15,.3,.5);
         //strafePIDGyro(.3,0,0,.15,15,.3,.5);
-        turnHeading(-90, 0, 0, 0, .3, .5, .5);
-        turnLeft(90, 0, 0, 0, -.3, .5, .5);
+        turnHeading(-90, 0, 0, 0, .4, .5, .5);
+        turnLeft(90, 0, 0, 0, -.4, .5, .5);
         telemetry.addData("FirstAngle", gyro.getAngle());
         telemetry.update();
     }
@@ -169,6 +175,15 @@ public class testingAuto extends LinearOpMode
         return start - 180; //bring it back to -180 to 180
     }
 
+    public double getLiftPosition(){
+        return (lL.getCurrentPosition() + rL.getCurrentPosition()) /2;
+    }
+    public void liftUp(double targetPos){
+        while (getLiftPosition() < targetPos) {
+            lL.setPower(.6);
+            rL.setPower(.6);
+        }
+    }
     public void movePIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){
         timer.reset();
         resetEncoder();
@@ -370,13 +385,13 @@ public class testingAuto extends LinearOpMode
                 if (Math.abs(kp) < .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors((-power - f)*.8,(power + f)*.8, -power - f,power + f);
+                startMotors((-power - f),(power + f), -power - f,power + f);
             }
             else{
                 if (Math.abs(kp) > .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+                startMotors((-power + f),(power - f), power + f,power - f);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
@@ -428,13 +443,13 @@ public class testingAuto extends LinearOpMode
                 if (Math.abs(kp) < .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors((power + f)*.8,(-power - f)*.8, power + f,-power - f);
+                startMotors((power + f),(-power - f), power + f,-power - f);
             }
             else{
                 if (Math.abs(kp) > .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+                startMotors((-power + f),(power - f), power + f,power - f);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
@@ -448,6 +463,72 @@ public class testingAuto extends LinearOpMode
             else{
                 atSetpoint = false;
             }
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+
+    public void setLiftPower(double power){
+        rL.setPower(power);
+        lL.setPower(power);
+    }
+
+    public void moveLiftPID(double inches, double kp, double ki, double kd, double f, double threshold, double time){
+        timer.reset();
+        resetEncoder();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialError = Math.abs(inches); //-20
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+
+            if (inches < 0){
+                error = inches + getTic() / COUNTS_PER_INCH;
+            }
+            else{
+                error = inches - getTic() / COUNTS_PER_INCH;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+
+            if (power > 0) {
+                    setLiftPower(power + f);
+                }
+                else {
+                    setLiftPower(power - f);
+                }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
             pastTime = currentTime;
             pastError = error;
         }

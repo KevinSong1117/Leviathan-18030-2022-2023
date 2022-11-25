@@ -22,11 +22,11 @@ public class PIDtesting extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private Orientation lastAngle = new Orientation();
     private double currentAngle = 0.0;
-    static final double COUNTS_PER_MOTOR_REV = 537.6;
+    static final double COUNTS_PER_MOTOR_REV = 537.7;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
-    static final double WHEEL_DIAMETER_INCHES = 4.0;
+    static final double WHEEL_DIAMETER_INCHES = 3.77953;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
+            (WHEEL_DIAMETER_INCHES * Math.PI);
 
     @Override
     public void runOpMode() throws InterruptedException {

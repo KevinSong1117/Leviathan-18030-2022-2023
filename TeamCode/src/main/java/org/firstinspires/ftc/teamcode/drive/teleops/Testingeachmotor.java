@@ -22,16 +22,16 @@ public class Testingeachmotor extends LinearOpMode {
         DcMotor bL = hardwareMap.dcMotor.get("bL");
         DcMotor fR = hardwareMap.dcMotor.get("fR");
         DcMotor bR = hardwareMap.dcMotor.get("bR");
-        DcMotor lI = hardwareMap.dcMotor.get("lI");
-        DcMotor rI = hardwareMap.dcMotor.get("rI");
-
-        CRServo fI = hardwareMap.get(CRServo.class, "fI");
-        CRServo bI = hardwareMap.get(CRServo.class, "bI");
+        Servo fI = hardwareMap.get(Servo.class, "fI");
+        Servo bI = hardwareMap.get(Servo.class, "bI");
 
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         fR.setDirection(DcMotor.Direction.FORWARD);
         bR.setDirection(DcMotor.Direction.FORWARD);
@@ -63,29 +63,33 @@ public class Testingeachmotor extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
+            boolean slow = false;
+            if (gamepad1.left_bumper)
+                slow = !slow;
+
+            if (slow) {
+                frontLeftPower /= 2;
+                frontRightPower /= 2;
+                backLeftPower /= 2;
+                backRightPower /= 2;
+            }
             fL.setPower(frontLeftPower);
             bL.setPower(backLeftPower);
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
 
-            if(gamepad1.left_trigger > .1){
-                fL.setPower(frontLeftPower*.5);
-                bL.setPower(backLeftPower*.5);
-                fR.setPower(frontRightPower*.5);
-                bR.setPower(backRightPower*.5);
-            }
+            
             if (gamepad2.left_bumper) {
-                fI.setPower(1);
-                bI.setPower(-1);
+                fI.setPosition(0);
+                bI.setPosition(1);
             }else if (gamepad2.right_bumper) {
-                fI.setPower(-1);
-                bI.setPower(1);
-            }else{fI.setPower(0);
-                bI.setPower(0);}
+                fI.setPosition(1);
+                bI.setPosition(0);
+            }
 
             double liftp = -gamepad2.left_stick_y;
-            lL.setPower(liftp/1.3);
-            rL.setPower(liftp/1.3);
+            lL.setPower(liftp*.7);
+            rL.setPower(liftp*.7);
             if (gamepad2.a) {
                 lO.setPosition(1);
                 rO.setPosition(0);
@@ -94,22 +98,11 @@ public class Testingeachmotor extends LinearOpMode {
                 lO.setPosition(0);
                 rO.setPosition(1);
             }
-            if(gamepad1.left_bumper){
-                lI.setPower(-.4);
-                rI.setPower(.4);
-            }else if(gamepad1.right_bumper)
-            {   lI.setPower(.4);
-                rI.setPower(-.4);}
-            else{lI.setPower(0);
-                rI.setPower(0);}
-
-            telemetry.addData("FL encoder value:", fL.getCurrentPosition());
-            telemetry.addData("FR encoder value:", fR.getCurrentPosition());
-            telemetry.addData("BL encoder value:", bL.getCurrentPosition());// this is negative for some reason
-            telemetry.addData("BR encoder value:", bR.getCurrentPosition());
-            telemetry.addData("Gamepad1 trigger", gamepad1.left_trigger);
+            telemetry.addData("Average lift encoder value:", (lL.getCurrentPosition() + rL.getCurrentPosition())/2);
+            telemetry.addData("Left Enocder", lL.getCurrentPosition());
+            telemetry.addData("Right Encoder", rL.getCurrentPosition());
             telemetry.update();
-
+            //
         }
     }
 

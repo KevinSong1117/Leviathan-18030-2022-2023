@@ -16,8 +16,15 @@ public class RobotCentricMecV2 extends LinearOpMode {
         DcMotorEx fR = hardwareMap.get(DcMotorEx.class,"fR");
         DcMotorEx bR = hardwareMap.get(DcMotorEx.class,"bR");
 
-        fR.setDirection(DcMotorSimple.Direction.REVERSE);
-        bR.setDirection(DcMotorSimple.Direction.REVERSE);
+        fR.setDirection(DcMotor.Direction.FORWARD);
+        bR.setDirection(DcMotor.Direction.FORWARD);
+        fL.setDirection(DcMotor.Direction.REVERSE);
+        bL.setDirection(DcMotor.Direction.FORWARD);
+        fR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
