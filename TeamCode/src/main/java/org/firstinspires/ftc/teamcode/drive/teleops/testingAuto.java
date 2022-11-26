@@ -57,7 +57,7 @@ public class testingAuto extends LinearOpMode
     ElapsedTime timer;
     static final double COUNTS_PER_MOTOR_REV = 537.7;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
-    static final double WHEEL_DIAMETER_INCHES = 3.77953;
+    static final double WHEEL_DIAMETER_INCHES = 3.7796;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
@@ -74,6 +74,9 @@ public class testingAuto extends LinearOpMode
         gyro = new Sensors(this);
         lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //Consider using BRAKE for the drivetrain in order to reduce inertia?
+        //Very damaging to the motors however
 
         fR.setDirection(DcMotor.Direction.FORWARD);
         bR.setDirection(DcMotor.Direction.FORWARD);
@@ -92,20 +95,31 @@ public class testingAuto extends LinearOpMode
 
         waitForStart();
         //movePIDFGyro(30,1,0,0,.15,.3,.5);
-        //strafePIDGyro(.3,0,0,.15,15,.3,.5);
-        turnHeading(-90, 0, 0, 0, .4, .5, .5);
-        turnLeft(90, 0, 0, 0, -.4, .5, .5);
+        movePIDFGyro(-20,1,0,0,.15,.4,.5);
+        movePIDFGyro(20,1,0,0,.15,.4,.5);
+        movePIDFGyro(-20,1,0,0,.15,.4,.5);
+        movePIDFGyro(20,1,0,0,.15,.4,.5);
+        movePIDFGyro(-20,1,0,0,.15,.4,.5);
+        movePIDFGyro(20,1,0,0,.15,.4,.5);
+
+
+        //strafePIDGyro(0,0,0,.3,15,.3,.5);
+        //turnRight(-90, 0, 0, 0, .4, .8, .5);
+        //turnLeft(90, 0, 0, 0, -.4, .8, .5);
+
+
+
         telemetry.addData("FirstAngle", gyro.getAngle());
         telemetry.update();
     }
 
     public void deliverA(String level){
         movePIDFGyro(-4,.3,0,0,.15,.2,.5);
-        turnHeading(270, 0, 0, 0, .16, .25, .5);
+        turnRight(270, 0, 0, 0, .16, .25, .5);
         movePIDFGyro(25,.3,0,0,.15,.2,.5);
         movePIDFGyro(-25,.3,0,0,.15,.2,.5);
-        turnHeading(160, 0, 0, 0, .16, .25, .5);
-        turnHeading(265, 0, 0, 0, .16, .25, .5);
+        turnRight(160, 0, 0, 0, .16, .25, .5);
+        turnRight(265, 0, 0, 0, .16, .25, .5);
         movePIDFGyro(40,.9,0,0,.15,.2,.5);
     }
 
@@ -176,7 +190,7 @@ public class testingAuto extends LinearOpMode
     }
 
     public double getLiftPosition(){
-        return (lL.getCurrentPosition() + rL.getCurrentPosition()) /2;
+        return ((lL.getCurrentPosition() + rL.getCurrentPosition() )/2);
     }
     public void liftUp(double targetPos){
         while (getLiftPosition() < targetPos) {
@@ -224,7 +238,7 @@ public class testingAuto extends LinearOpMode
 
             double power = kp * proportional + ki * integral + kd * derivative;
 
-            double difference = gyro.angleDiff(initialHeading);
+            double difference = angleDiffSigma(initialHeading, gyro.getAngle());
 
             if (difference > .6){
                 if (power > 0) {
@@ -410,7 +424,7 @@ public class testingAuto extends LinearOpMode
         }
         stopMotors();
     }
-    public void turnHeading(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+    public void turnRight(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
         timer.reset();
 
         double pastTime = 0;
@@ -495,10 +509,10 @@ public class testingAuto extends LinearOpMode
         while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
 
             if (inches < 0){
-                error = inches + getTic() / COUNTS_PER_INCH;
+                error = inches + getLiftPosition() / COUNTS_PER_INCH;
             }
             else{
-                error = inches - getTic() / COUNTS_PER_INCH;
+                error = inches - getLiftPosition() / COUNTS_PER_INCH;
             }
 
             currentTime = timer.milliseconds();
@@ -509,6 +523,7 @@ public class testingAuto extends LinearOpMode
             double derivative = (error - pastError) / dt;
 
             double power = kp * proportional + ki * integral + kd * derivative;
+
 
             if (power > 0) {
                     setLiftPower(power + f);

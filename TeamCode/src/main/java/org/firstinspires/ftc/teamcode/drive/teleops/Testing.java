@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="testing", group="test")
 public class Testing extends OpMode {
-    public LiftState lift = LiftState.IDLE;
     DcMotor fL = hardwareMap.dcMotor.get("fL");
     DcMotor bL = hardwareMap.dcMotor.get("bL");
     DcMotor fR = hardwareMap.dcMotor.get("fR");
@@ -57,40 +56,6 @@ public class Testing extends OpMode {
         rL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-
-    public double getLiftPos()
-    {
-        return Math.abs((lL.getCurrentPosition() + rL.getCurrentPosition()) / 2.0);
-    }
-
-    public void setLiftPower(double power)
-    {
-        lL.setPower(power);
-        rL.setPower(power);
-    }
-    public void setLiftPos(double liftTargetPos)
-    {
-        if (getLiftPos() <= liftTargetPos - 50)
-        {
-            setLiftPower(-.9);
-        }
-    }
-
-    public void liftReset(double power, double liftTargetPos)
-    {
-        if (getLiftPos() >= 50 + liftTargetPos)
-        {
-            setLiftPower(power);
-        }
-    }
-
-    public enum LiftState {
-        IDLE,
-        RAISE,
-        PLACE,
-        LOWER,
-    }
-
     @Override
     public void loop() {
         double liftp = -gamepad2.left_stick_y;
@@ -98,19 +63,11 @@ public class Testing extends OpMode {
         double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
         double rx = gamepad1.right_stick_x;
 
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio, but only when
-        // at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
 
-        fL.setPower(frontLeftPower);
-        bL.setPower(backLeftPower);
-        fR.setPower(frontRightPower);
-        bR.setPower(backRightPower);
+        fL.setPower(y+rx);
+        bL.setPower(y+rx);
+        fR.setPower(y+rx);
+        bR.setPower(y+rx);
 
         lL.setPower(liftp/3);
         rL.setPower(liftp/3);
