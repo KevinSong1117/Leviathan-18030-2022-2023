@@ -53,6 +53,10 @@ public class testingAuto extends LinearOpMode
     public DcMotor bR;
     public DcMotor lL;
     public DcMotor rL;
+    Servo lO;
+    Servo rO;
+    CRServo fI;
+    CRServo bI;
     Sensors gyro;
     ElapsedTime timer;
     static final double COUNTS_PER_MOTOR_REV = 537.7;
@@ -70,7 +74,10 @@ public class testingAuto extends LinearOpMode
         bR = hardwareMap.get(DcMotor.class, "bR");
         lL = hardwareMap.get(DcMotor.class, "lL");
         rL = hardwareMap.get(DcMotor.class, "rL");
-
+        lO = hardwareMap.servo.get("lO");
+        rO = hardwareMap.servo.get("rO");
+        fI = hardwareMap.get(CRServo.class, "fI");
+        bI = hardwareMap.get(CRServo.class, "bI");
         gyro = new Sensors(this);
         lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -95,23 +102,25 @@ public class testingAuto extends LinearOpMode
 
         waitForStart();
         //movePIDFGyro(30,1,0,0,.15,.3,.5);
-        movePIDFGyro(-20,1,0,0,.15,.4,.5);
-        movePIDFGyro(20,1,0,0,.15,.4,.5);
-        movePIDFGyro(-20,1,0,0,.15,.4,.5);
-        movePIDFGyro(20,1,0,0,.15,.4,.5);
-        movePIDFGyro(-20,1,0,0,.15,.4,.5);
-        movePIDFGyro(20,1,0,0,.15,.4,.5);
+        movePIDFGyro(-50,1,0,0,.15,.4,.5);
+        turnLeft(30, 0, 0, 0, -.4, .8, .5);
+        liftUp(6500);
+        movePIDFGyro(-2,1,0,0,.15,.4,.5);
+        out();
+        outtake();
 
+        /*strafePIDGyro(0,0,0,.3,15,.3,.5);
+        turnRight(-90, 0, 0, 0, .4, .8, .5);
 
-        //strafePIDGyro(0,0,0,.3,15,.3,.5);
-        //turnRight(-90, 0, 0, 0, .4, .8, .5);
-        //turnLeft(90, 0, 0, 0, -.4, .8, .5);
 
 
 
         telemetry.addData("FirstAngle", gyro.getAngle());
         telemetry.update();
+        */
+
     }
+
 
     public void deliverA(String level){
         movePIDFGyro(-4,.3,0,0,.15,.2,.5);
@@ -134,6 +143,22 @@ public class testingAuto extends LinearOpMode
         bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+    public void intake(){
+        fI.setPower(-1);
+        bI.setPower(1);
+        sleep(1000);
+        fI.setPower(0);
+        bI.setPower(0);
+    }
+    public void outtake() {
+        fI.setPower(1);
+        bI.setPower(-1);
+        sleep(1000);
+        fI.setPower(0);
+        bI.setPower(0);
+    }
+
     public void startMotors(double fl, double fr, double bl, double br) {
         fR.setPower(fr);
         fL.setPower(fl);
@@ -192,12 +217,33 @@ public class testingAuto extends LinearOpMode
     public double getLiftPosition(){
         return ((lL.getCurrentPosition() + rL.getCurrentPosition() )/2);
     }
-    public void liftUp(double targetPos){
-        while (getLiftPosition() < targetPos) {
-            lL.setPower(.6);
-            rL.setPower(.6);
-        }
+    public void liftUp(double change){
+        double old = getLiftPosition();
+        if (change > 0)
+            while (getLiftPosition() < old + change) {
+                lL.setPower(.6);
+                rL.setPower(.6);
+            }
+        else
+            while (getLiftPosition() > old + change) {
+                lL.setPower(-.6);
+                rL.setPower(-.6);
+            }
+        lL.setPower(.01);
+        rL.setPower(.01);
     }
+    public void in(){
+        lO.setPosition(1);
+        rO.setPosition(0);
+    }
+
+    public void out()
+
+    {
+        lO.setPosition(0);
+        rO.setPosition(1);
+    }
+
     public void movePIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){
         timer.reset();
         resetEncoder();
