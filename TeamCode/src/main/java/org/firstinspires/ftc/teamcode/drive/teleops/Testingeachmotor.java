@@ -22,8 +22,8 @@ public class Testingeachmotor extends LinearOpMode {
         DcMotor bL = hardwareMap.dcMotor.get("bL");
         DcMotor fR = hardwareMap.dcMotor.get("fR");
         DcMotor bR = hardwareMap.dcMotor.get("bR");
-        CRServo fI = hardwareMap.get(CRServo.class, "fI");
-        CRServo bI = hardwareMap.get(CRServo.class, "bI");
+        Servo fI = hardwareMap.get(Servo.class, "fI");
+        Servo bI = hardwareMap.get(Servo.class, "bI");
 
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -78,8 +78,18 @@ public class Testingeachmotor extends LinearOpMode {
             fR.setPower(frontRightPower);
             bR.setPower(backRightPower);
 
-            
+            //open
             if (gamepad2.left_bumper) {
+                fI.setPosition(.55);
+                bI.setPosition(.4);
+            }
+            //close
+            if (gamepad2.right_bumper) {
+                fI.setPosition(1);
+                bI.setPosition(0);
+            }
+
+            /*if (gamepad2.left_bumper) {
                 fI.setPower(-1);
                 bI.setPower(1);
             }else if (gamepad2.right_bumper) {
@@ -88,11 +98,11 @@ public class Testingeachmotor extends LinearOpMode {
             }else{
                 fI.setPower(0);
                 bI.setPower(0);
-            }
+            }*/
 
             double liftp = -gamepad2.left_stick_y;
-            lL.setPower(liftp*.9);
-            rL.setPower(liftp*.9);
+            lL.setPower(liftp);
+            rL.setPower(liftp);
 
             if (gamepad2.a) {
                 lO.setPosition(1);

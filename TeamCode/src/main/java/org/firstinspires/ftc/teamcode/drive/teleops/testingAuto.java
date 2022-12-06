@@ -55,8 +55,8 @@ public class testingAuto extends LinearOpMode
     public DcMotor rL;
     Servo lO;
     Servo rO;
-    CRServo fI;
-    CRServo bI;
+    Servo fI;
+    Servo bI;
     Sensors gyro;
     ElapsedTime timer;
     static final double COUNTS_PER_MOTOR_REV = 537.7;
@@ -76,8 +76,8 @@ public class testingAuto extends LinearOpMode
         rL = hardwareMap.get(DcMotor.class, "rL");
         lO = hardwareMap.servo.get("lO");
         rO = hardwareMap.servo.get("rO");
-        fI = hardwareMap.get(CRServo.class, "fI");
-        bI = hardwareMap.get(CRServo.class, "bI");
+        fI = hardwareMap.servo.get( "fI");
+        bI = hardwareMap.servo.get("bI");
         gyro = new Sensors(this);
         lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -101,13 +101,26 @@ public class testingAuto extends LinearOpMode
         bL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         waitForStart();
+       //moveLiftPID(110, 0,0,0,.60,2,.5);
+        sleep(4000);
+        //18 inches
+        //136,11111111111108
+
+        //This works quite well have tested it twice
+        //moveLiftPID(10, 0, 0, 0, .3, .5, .5);
+        //35 inches
         //movePIDFGyro(30,1,0,0,.15,.3,.5);
+
         movePIDFGyro(-50,1,0,0,.15,.4,.5);
-        turnLeft(30, 0, 0, 0, -.4, .8, .5);
-        liftUp(6500);
-        movePIDFGyro(-2,1,0,0,.15,.4,.5);
+        turnLeft(30, 0, 0, 0, -.39, .9, .5);
+        moveLiftPID(100, 0,0,0,.60,2,.5);
         out();
         outtake();
+        in();
+        moveLiftPID(-100, 0,0,0,.60,2,.5);
+        turnRight(-30, 0, 0, 0, .39, .9, .5);
+        movePIDFGyro(30,0, 0, 0, -.39, .9, .5);
+
 
         /*strafePIDGyro(0,0,0,.3,15,.3,.5);
         turnRight(-90, 0, 0, 0, .4, .8, .5);
@@ -145,18 +158,13 @@ public class testingAuto extends LinearOpMode
     }
 
     public void intake(){
-        fI.setPower(-1);
-        bI.setPower(1);
-        sleep(1000);
-        fI.setPower(0);
-        bI.setPower(0);
+        fI.setPosition(1);
+        bI.setPosition(0);
     }
     public void outtake() {
-        fI.setPower(1);
-        bI.setPower(-1);
+        fI.setPosition(.55);
+        bI.setPosition(-.4);
         sleep(1000);
-        fI.setPower(0);
-        bI.setPower(0);
     }
 
     public void startMotors(double fl, double fr, double bl, double br) {
@@ -572,10 +580,10 @@ public class testingAuto extends LinearOpMode
 
 
             if (power > 0) {
-                    setLiftPower(power + f);
+                    setLiftPower(-power - f);
                 }
                 else {
-                    setLiftPower(power - f);
+                    setLiftPower(-power + f);
                 }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
@@ -590,10 +598,11 @@ public class testingAuto extends LinearOpMode
                 atSetpoint = false;
             }
 
+
             pastTime = currentTime;
             pastError = error;
         }
-        stopMotors();
+        setLiftPower(.001);
     }
 
 }

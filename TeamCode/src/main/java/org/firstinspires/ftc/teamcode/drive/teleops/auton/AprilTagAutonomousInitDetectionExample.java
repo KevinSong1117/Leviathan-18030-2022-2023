@@ -536,7 +536,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
         stopMotors();
     }
-    public void turnHeading(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+    public void turnRight(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
         timer.reset();
 
         double pastTime = 0;
@@ -569,13 +569,13 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
                 if (Math.abs(kp) < .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors((power + f)*.8,(-power - f)*.8, power + f,-power - f);
+                startMotors((power + f),(-power - f), power + f,-power - f);
             }
             else{
                 if (Math.abs(kp) > .0001){
                     power = 0 * proportional + ki * integral + kd * derivative;
                 }
-                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+                startMotors((-power + f),(power - f), power + f,power - f);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
