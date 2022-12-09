@@ -33,6 +33,12 @@ public class Testingeachmotor extends LinearOpMode {
         lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        lL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        lL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         fR.setDirection(DcMotor.Direction.FORWARD);
         bR.setDirection(DcMotor.Direction.FORWARD);
         fL.setDirection(DcMotor.Direction.REVERSE);
@@ -112,7 +118,7 @@ public class Testingeachmotor extends LinearOpMode {
                 lO.setPosition(0);
                 rO.setPosition(1);
             }
-            telemetry.addData("Average lift encoder value:", (lL.getCurrentPosition() + rL.getCurrentPosition())/2);
+            telemetry.addData("Average lift encoder value:", (Math.abs(lL.getCurrentPosition()) + Math.abs(rL.getCurrentPosition()))/2);
             telemetry.addData("Left Enocder", lL.getCurrentPosition());
             telemetry.addData("Right Encoder", rL.getCurrentPosition());
             telemetry.update();

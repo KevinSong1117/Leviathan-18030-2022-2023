@@ -105,7 +105,7 @@ public class testingAuto extends LinearOpMode
 
         waitForStart();
 
-        //moveLiftPID(100, 0,0,0,.60,2,.5);
+        moveLiftPID(200, 0,0,0,.60,2,.5);
         //moveLiftPID(-100, 0,0,0,-.60,2,.5);
         //18 inches
         //136,11111111111108
@@ -115,7 +115,7 @@ public class testingAuto extends LinearOpMode
         //35 inches
         //movePIDFGyro(30,1,0,0,.15,.3,.5);
 
-        movePIDFGyro(-48,1,0,0,.15,.4,.5);
+        /*movePIDFGyro(-48,1,0,0,.15,.4,.5);
         sleep(1000);
         turnLeft(40, 0, 0, 0, -.38, 1.1, .5);
         sleep(1000);
@@ -134,7 +134,7 @@ public class testingAuto extends LinearOpMode
         //if 1
         turnRight(-86,0, 0, 0, .38, 1.1, .5);
         sleep(1000);
-        movePIDFGyro(24,1,0,0,.15,.4,.5);
+        movePIDFGyro(24,1,0,0,.15,.4,.5);*/
         //if 2
         //nothing
 
@@ -255,7 +255,7 @@ public class testingAuto extends LinearOpMode
     }
 
     public double getLiftPosition(){
-        return ((lL.getCurrentPosition()) + (rL.getCurrentPosition())/2);
+        return (Math.abs(lL.getCurrentPosition()) + (rL.getCurrentPosition())/2);
     }
     public void liftUp(double change){
         double old = getLiftPosition();

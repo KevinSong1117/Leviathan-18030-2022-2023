@@ -202,7 +202,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         // Actually do something useful
         movePIDFGyro(-48,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnLeft(40, 0, 0, 0, -.38, 1.1, .5);
+        turnLeft(39, 0, 0, 0, -.35, 1, .5);
         sleep(1000);
         moveLiftPID(226, 0,0,0,.60,2,.5);
         sleep(1000);
@@ -214,16 +214,16 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         sleep(1000);
         movePIDFGyro(9,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnRight(0, 0, 0, 0, .38, 1.1, .5);
+        turnRight(0, 0, 0, 0, .35, 1.1, .5);
         sleep(1000);
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            turnRight(-86,0, 0, 0, .38, 1.1, .5);
+            turnRight(-86,0, 0, 0, .35, 1.1, .5);
             sleep(1000);
             movePIDFGyro(24,1,0,0,.15,.4,.5);
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
-            turnLeft(-90,0, 0, 0, .38, 1.1, .5);
+            turnLeft(-90,0, 0, 0, .35, 1.1, .5);
             movePIDFGyro(24,1,0,0,.15,.4,.5);
         }
 
@@ -684,11 +684,10 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         return start - 180; //bring it back to -180 to 180
     }
     public double getLiftPosition(){
-        return ((lL.getCurrentPosition()) + (rL.getCurrentPosition())/2);
+        return (Math.abs(lL.getCurrentPosition()) + (rL.getCurrentPosition())/2);
     }
 
-    void tagToTelemetry(AprilTagDetection detection)
-    {
+    void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
