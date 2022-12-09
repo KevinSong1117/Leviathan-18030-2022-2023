@@ -101,7 +101,7 @@ public class Testingeachmotor extends LinearOpMode {
             }*/
 
             double liftp = -gamepad2.left_stick_y;
-            lL.setPower(liftp);
+            lL.setPower(-liftp);
             rL.setPower(liftp);
 
             if (gamepad2.a) {

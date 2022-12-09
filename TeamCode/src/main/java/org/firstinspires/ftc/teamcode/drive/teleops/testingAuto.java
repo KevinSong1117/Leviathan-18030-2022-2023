@@ -569,7 +569,7 @@ public class testingAuto extends LinearOpMode
 
     public void setLiftPower(double power){
         rL.setPower(power);
-        lL.setPower(power);
+        lL.setPower(-power);
     }
 
     public void moveLiftPID(double inches, double kp, double ki, double kd, double f, double threshold, double time){
