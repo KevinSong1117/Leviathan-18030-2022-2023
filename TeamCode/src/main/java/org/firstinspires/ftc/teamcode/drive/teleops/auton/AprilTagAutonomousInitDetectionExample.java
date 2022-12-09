@@ -53,9 +53,9 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
     double tagsize = 0.166;
 
-    int LEFT = 1;
+    int LEFT = 3;
     int MIDDLE = 2;
-    int RIGHT = 3;
+    int RIGHT = 1;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -200,19 +200,19 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
 
         // Actually do something useful
-        movePIDFGyro(-48,1,0,0,.15,.4,.5);
+        movePIDFGyro(-46,1,0,0,.15,.4,.5);
         sleep(1000);
         turnLeft(39, 0, 0, 0, -.35, 1, .5);
         sleep(1000);
-        moveLiftPID(226, 0,0,0,.60,2,.5);
+        moveLiftPID(228, 0,0,0,.60,2,.5);
         sleep(1000);
-        movePIDFGyro(-9,1,0,0,.15,.4,.5);
+        movePIDFGyro(-11,1,0,0,.15,.4,.5);
         out();
         sleep(2000);
         outtake(2000);
         in();
         sleep(1000);
-        movePIDFGyro(9,1,0,0,.15,.4,.5);
+        movePIDFGyro(8,1,0,0,.15,.4,.5);
         sleep(1000);
         turnRight(0, 0, 0, 0, .35, 1.1, .5);
         sleep(1000);
