@@ -223,8 +223,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
-            turnLeft(-90,0, 0, 0, .35, 1.1, .5);
-            movePIDFGyro(24,1,0,0,.15,.4,.5);
+            turnLeft(90,0, 0, 0, -.35, 1.1, .5);
+            movePIDFGyro(21,1,0,0,.15,.4,.5);
         }
 
         while (opModeIsActive()) {sleep(20);}
