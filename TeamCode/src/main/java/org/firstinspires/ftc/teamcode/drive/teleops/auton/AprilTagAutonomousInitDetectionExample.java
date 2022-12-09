@@ -4,6 +4,7 @@ import  com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -27,6 +28,11 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
     public DcMotor rL;
     public DcMotor lL;
+
+    Servo lO;
+    Servo rO;
+    Servo fI;
+    Servo bI;
 
     Sensors gyro;
     ElapsedTime timer;
@@ -64,6 +70,11 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         lL = hardwareMap.get(DcMotor.class, "lL");
         rL = hardwareMap.get(DcMotor.class, "rL");
+
+        lO = hardwareMap.servo.get("lO");
+        rO = hardwareMap.servo.get("rO");
+        fI = hardwareMap.servo.get( "fI");
+        bI = hardwareMap.servo.get("bI");
 
         gyro = new Sensors(this);
         lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -111,6 +122,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
          */
         while (!isStarted() && !isStopRequested())
         {
+            fI.setPosition(1);
+            bI.setPosition(0);
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
             if(currentDetections.size() != 0)
@@ -187,129 +200,45 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
 
         // Actually do something useful
-        movePIDFGyro(-28,1,0,0,.15,.3,.5);
-
-
-        int height = 200;
-        for (int i = 0; i < 1; i++) {
-            turnLeft(-15, 0, 0, 0, .34, .5, .5);
-            lift(2700);
-            //horizontal slide
-            //claw release
-            //horizontal slide
-            lift(height);
-            turnLeft(88, 0, 0, 0, -.34, .5, .5);
-            movePIDFGyro(15, 1, 0, 0, .15, .3, .5);
-            // tight claw
-            movePIDFGyro(-15, 1, 0, 0, .15, .3, .5);
-            height -= 50;
-        }
-        turnLeft(180, 0, 0, 0, .34, .5, .5);
+        movePIDFGyro(-48,1,0,0,.15,.4,.5);
+        sleep(1000);
+        turnLeft(40, 0, 0, 0, -.38, 1.1, .5);
+        sleep(1000);
+        moveLiftPID(226, 0,0,0,.60,2,.5);
+        sleep(1000);
+        movePIDFGyro(-9,1,0,0,.15,.4,.5);
+        out();
+        sleep(2000);
+        outtake(2000);
+        in();
+        sleep(1000);
+        movePIDFGyro(9,1,0,0,.15,.4,.5);
+        sleep(1000);
+        turnRight(0, 0, 0, 0, .38, 1.1, .5);
+        sleep(1000);
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            movePIDFGyro(28,1,0,0,.15,.3,.5);
-            turnLeft(88, 0, 0, 0, -.34, .5, .5);
-            movePIDFGyro(26,1,0,0,.15,.3,.5);
+            turnRight(-86,0, 0, 0, .38, 1.1, .5);
+            sleep(1000);
+            movePIDFGyro(24,1,0,0,.15,.4,.5);
         }else if(tagOfInterest.id == MIDDLE){
-            movePIDFGyro(28,1,0,0,.15,.3,.5);
+            //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
-            movePIDFGyro(28,1,0,0,.15,.3,.5);
-            turnLeft(-88, 0, 0, 0, .34, .5, .5);
-            movePIDFGyro(26,1,0,0,.15,.3,.5);
-
+            turnLeft(-90,0, 0, 0, .38, 1.1, .5);
+            movePIDFGyro(24,1,0,0,.15,.4,.5);
         }
-
 
         while (opModeIsActive()) {sleep(20);}
     }
 
-    public void resetEncoder() {
-        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void in(){
+        lO.setPosition(1);
+        rO.setPosition(0);
     }
-    public void startMotors(double fl, double fr, double bl, double br) {
-        fR.setPower(fr);
-        fL.setPower(fl);
-        bL.setPower(bl);
-        bR.setPower(br);
-
-        telemetry.addData("fl", fl);
-        telemetry.addData("fr", fr);
-        telemetry.addData("bl", bl);
-        telemetry.addData("br", br);
-        telemetry.update();
+    public void out() {
+        lO.setPosition(0);
+        rO.setPosition(1);
     }
-    public void stopMotors() {
-        fR.setPower(0);
-        fL.setPower(0);
-        bR.setPower(0);
-        bL.setPower(0);
-    }
-    public double getTic() {
-        double count = 4;
-        if (fR.getCurrentPosition() == 0) {
-            count -= 1.0;
-        }
-        if (fL.getCurrentPosition() == 0) {
-            count -= 1.0;
-        }
-        if (bR.getCurrentPosition() == 0) {
-            count -= 1.0;
-        }
-        if (bL.getCurrentPosition() == 0) {
-            count -= 1.0;
-        }
-        double totaldis = Math.abs(fR.getCurrentPosition()) + Math.abs(fL.getCurrentPosition()) + Math.abs(bL.getCurrentPosition()) + Math.abs(bR.getCurrentPosition());
-        if (count == 0) {
-            return 1;
-        }
-        return totaldis / count;
-    }
-    public double angleDiffSigma(double angle1, double angle2)
-    {
-        return angleWrapDeg(angle2 - angle1);
-    }
-
-    public double angleWrapDeg(double angle)
-    {
-        double zeroTo360 = angle + 180;      //convert to 0-360
-        double start = (zeroTo360 % 360); //will work for positive angles
-        //angle is (-360, 0), add 360 to make it from 0-360
-        if (start < 0)
-        {
-            start += 360;
-        }
-        return start - 180; //bring it back to -180 to 180
-    }
-
-    public void setLiftPower(double power){
-        rL.setPower(power);
-        lL.setPower(power);
-    }
-    public double getLiftPosition(){
-        return (lL.getCurrentPosition() + rL.getCurrentPosition()) /2;
-    }
-    public void lift(double targetPos){
-        if (getLiftPosition() < targetPos) {
-            while (getLiftPosition() < targetPos) {
-                lL.setPower(.6);
-                rL.setPower(.6);
-            }
-        }
-        else {
-            while (getLiftPosition() > targetPos) {
-                lL.setPower(-.6);
-                rL.setPower(-.6);
-            }
-        }
-    }
-
     public void movePIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){
         timer.reset();
         resetEncoder();
@@ -350,7 +279,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
             double power = kp * proportional + ki * integral + kd * derivative;
 
-            double difference = gyro.angleDiff(initialHeading);
+            double difference = angleDiffSigma(initialHeading, gyro.getAngle());
 
             if (difference > .6){
                 if (power > 0) {
@@ -393,6 +322,188 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             pastError = error;
         }
         stopMotors();
+    }
+    public void turnLeft(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+        timer.reset();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+        finalAngle = angleWrapDeg(finalAngle);
+
+        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
+        double error = initialAngleDiff;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / Math.abs(initialAngleDiff);
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            if (power > 0) {
+                if (Math.abs(kp) < .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power - f),(power + f), -power - f,power + f);
+            }
+            else{
+                if (Math.abs(kp) > .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power + f),(power - f), power + f,power - f);
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+    public void turnRight(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
+        timer.reset();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+        finalAngle = angleWrapDeg(finalAngle);
+
+        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
+        double error = initialAngleDiff;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / Math.abs(initialAngleDiff);
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+            if (power > 0) {
+                if (Math.abs(kp) < .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((power + f),(-power - f), power + f,-power - f);
+            }
+            else{
+                if (Math.abs(kp) > .0001){
+                    power = 0 * proportional + ki * integral + kd * derivative;
+                }
+                startMotors((-power + f),(power - f), power + f,power - f);
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+    public void setLiftPower(double power){
+        rL.setPower(power);
+        lL.setPower(-power);
+    }
+    public void moveLiftPID(double inches, double kp, double ki, double kd, double f, double threshold, double time){
+        timer.reset();
+        resetLiftEncoder();
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialError = Math.abs(inches); //-20
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+
+            if (inches < 0){
+                error = inches + getLiftPosition() / COUNTS_PER_INCH;
+            }
+            else{
+                error = inches - getLiftPosition() / COUNTS_PER_INCH;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+
+
+            if (power > 0) {
+                setLiftPower(-power - f);
+            }
+            else {
+                setLiftPower(-power + f);
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
+
+            pastTime = currentTime;
+            pastError = error;
+        }
+        setLiftPower(.001);
     }
     public void strafePIDGyro(double kp, double ki, double kd, double f, double inches, double threshold, double time){
         timer.reset();
@@ -477,122 +588,103 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
         stopMotors();
     }
-
-    public void turnLeft(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
-        timer.reset();
-
-        double pastTime = 0;
-        double currentTime = timer.milliseconds();
-
-        double initialHeading = gyro.getAngle();
-        finalAngle = angleWrapDeg(finalAngle);
-
-        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
-        double error = initialAngleDiff;
-        double pastError = error;
-
-        double integral = 0;
-
-        double timeAtSetPoint = 0;
-        double firstTimeAtSetPoint = 0;
-        boolean atSetpoint = false;
-
-        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
-            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
-            currentTime = timer.milliseconds();
-            double dt = currentTime - pastTime;
-
-            double proportional = error / Math.abs(initialAngleDiff);
-            integral += dt * ((error + pastError) / 2.0);
-            double derivative = (error - pastError) / dt;
-
-            double power = kp * proportional + ki * integral + kd * derivative;
-            if (power > 0) {
-                if (Math.abs(kp) < .0001){
-                    power = 0 * proportional + ki * integral + kd * derivative;
-                }
-                startMotors((-power - f)*.8,(power + f)*.8, -power - f,power + f);
+    public void liftUp(double change){
+        double old = getLiftPosition();
+        if (change > 0)
+            while (getLiftPosition() < old + change) {
+                lL.setPower(.6);
+                rL.setPower(.6);
             }
-            else{
-                if (Math.abs(kp) > .0001){
-                    power = 0 * proportional + ki * integral + kd * derivative;
-                }
-                startMotors((-power + f)*.8,(power - f)*.8, power + f,power - f);
+        else
+            while (getLiftPosition() > old + change) {
+                lL.setPower(-.6);
+                rL.setPower(-.6);
             }
-            if (Math.abs(error) < threshold){
-                if (!atSetpoint){
-                    atSetpoint = true;
-                    firstTimeAtSetPoint = currentTime;
-                }
-                else{
-                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
-                }
-            }
-            else{
-                atSetpoint = false;
-            }
-            pastTime = currentTime;
-            pastError = error;
-        }
-        stopMotors();
+        lL.setPower(.01);
+        rL.setPower(.01);
     }
-    public void turnRight(double finalAngle, double kp, double ki, double kd, double f, double threshold, double time) {
-        timer.reset();
+    public void intake(){
+        fI.setPosition(1);
+        bI.setPosition(0);
+    }
 
-        double pastTime = 0;
-        double currentTime = timer.milliseconds();
 
-        double initialHeading = gyro.getAngle();
-        finalAngle = angleWrapDeg(finalAngle);
+    public void resetEncoder() {
+        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        double initialAngleDiff = angleDiffSigma(finalAngle, initialHeading);
-        double error = initialAngleDiff;
-        double pastError = error;
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public void resetLiftEncoder(){
+        lL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        double integral = 0;
+        lL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public void outtake(int time) {
+        fI.setPosition(.55);
+        bI.setPosition(.4);
+        sleep(time);
+    }
+    public void startMotors(double fl, double fr, double bl, double br) {
+        fR.setPower(fr);
+        fL.setPower(fl);
+        bL.setPower(bl);
+        bR.setPower(br);
 
-        double timeAtSetPoint = 0;
-        double firstTimeAtSetPoint = 0;
-        boolean atSetpoint = false;
-
-        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
-            error = gyro.newAngleDiff(gyro.getAngle(), finalAngle);
-            currentTime = timer.milliseconds();
-            double dt = currentTime - pastTime;
-
-            double proportional = error / Math.abs(initialAngleDiff);
-            integral += dt * ((error + pastError) / 2.0);
-            double derivative = (error - pastError) / dt;
-
-            double power = kp * proportional + ki * integral + kd * derivative;
-            if (power > 0) {
-                if (Math.abs(kp) < .0001){
-                    power = 0 * proportional + ki * integral + kd * derivative;
-                }
-                startMotors((power + f),(-power - f), power + f,-power - f);
-            }
-            else{
-                if (Math.abs(kp) > .0001){
-                    power = 0 * proportional + ki * integral + kd * derivative;
-                }
-                startMotors((-power + f),(power - f), power + f,power - f);
-            }
-            if (Math.abs(error) < threshold){
-                if (!atSetpoint){
-                    atSetpoint = true;
-                    firstTimeAtSetPoint = currentTime;
-                }
-                else{
-                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
-                }
-            }
-            else{
-                atSetpoint = false;
-            }
-            pastTime = currentTime;
-            pastError = error;
+        telemetry.addData("fl", fl);
+        telemetry.addData("fr", fr);
+        telemetry.addData("bl", bl);
+        telemetry.addData("br", br);
+        telemetry.update();
+    }
+    public void stopMotors() {
+        fR.setPower(0);
+        fL.setPower(0);
+        bR.setPower(0);
+        bL.setPower(0);
+    }
+    public double getTic() {
+        double count = 4;
+        if (fR.getCurrentPosition() == 0) {
+            count -= 1.0;
         }
-        stopMotors();
+        if (fL.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (bR.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        if (bL.getCurrentPosition() == 0) {
+            count -= 1.0;
+        }
+        double totaldis = Math.abs(fR.getCurrentPosition()) + Math.abs(fL.getCurrentPosition()) + Math.abs(bL.getCurrentPosition()) + Math.abs(bR.getCurrentPosition());
+        if (count == 0) {
+            return 1;
+        }
+        return totaldis / count;
+    }
+    public double angleDiffSigma(double angle1, double angle2){
+        return angleWrapDeg(angle2 - angle1);
+    }
+    public double angleWrapDeg(double angle) {
+        double zeroTo360 = angle + 180;      //convert to 0-360
+        double start = (zeroTo360 % 360); //will work for positive angles
+        //angle is (-360, 0), add 360 to make it from 0-360
+        if (start < 0)
+        {
+            start += 360;
+        }
+        return start - 180; //bring it back to -180 to 180
+    }
+    public double getLiftPosition(){
+        return ((lL.getCurrentPosition()) + (rL.getCurrentPosition())/2);
     }
 
     void tagToTelemetry(AprilTagDetection detection)
