@@ -200,11 +200,11 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
 
         // Actually do something useful
-        movePIDFGyro(-46,1,0,0,.15,.4,.5);
+        movePIDFGyro(-50,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnLeft(39, 0, 0, 0, -.35, 1, .5);
+        turnLeft(38, 0, 0, 0, -.35, 1, .5);
         sleep(1000);
-        moveLiftPID(228, 0,0,0,.60,2,.5);
+        moveLiftPID(230, 0,0,0,.60,2,.5);
         sleep(1000);
         movePIDFGyro(-11,1,0,0,.15,.4,.5);
         out();
@@ -219,12 +219,12 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
             turnRight(-86,0, 0, 0, .35, 1.1, .5);
             sleep(1000);
-            movePIDFGyro(24,1,0,0,.15,.4,.5);
+            movePIDFGyro(23,1,0,0,.15,.4,.5);
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
-            turnLeft(90,0, 0, 0, -.35, 1.1, .5);
-            movePIDFGyro(21,1,0,0,.15,.4,.5);
+            turnLeft(86,0, 0, 0, -.35, 1.1, .5);
+            movePIDFGyro(23,1,0,0,.15,.4,.5);
         }
 
         while (opModeIsActive()) {sleep(20);}
