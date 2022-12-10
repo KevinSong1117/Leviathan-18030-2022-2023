@@ -105,7 +105,7 @@ public class testingAuto extends LinearOpMode
 
         waitForStart();
 
-        moveLiftPID(200, 0,0,0,.60,2,.5);
+        moveLiftPID(220, 0,0,0,.60,2,.5);
         //moveLiftPID(-100, 0,0,0,-.60,2,.5);
         //18 inches
         //136,11111111111108

@@ -18,7 +18,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @Autonomous
-public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
+public class LeftAuto extends LinearOpMode
 {
     // Declare OpMode members.
     public DcMotor fL;
@@ -204,19 +204,19 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         movePIDFGyro(-5,1,0,0,.15,.4,.5);
         movePIDFGyro(5,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnLeft(34, 0, 0, 0, -.34, 1.1, .5);
+        turnRight(-33, 0, 0, 0, .35, 1, .5);
         sleep(1000);
         moveLiftPID(230, 0,0,0,.60,2,.5);
         sleep(1000);
-        movePIDFGyro(-12,1,0,0,.15,.4,.5);
+        movePIDFGyro(-11,1,0,0,.15,.4,.5);
         out();
         sleep(2000);
         outtake(2000);
         in();
         sleep(1000);
-        movePIDFGyro(7,1,0,0,.15,.4,.5);
+        movePIDFGyro(8,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnRight(0, 0, 0, 0, .35, 1.1, .5);
+        turnLeft(0, 0, 0, 0, -.35, 1.1, .5);
         sleep(1000);
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
             turnRight(-86,0, 0, 0, .35, 1.1, .5);
@@ -225,8 +225,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
-            turnLeft(85,0, 0, 0, -.35, 1.1, .5);
-            movePIDFGyro(25,1,0,0,.15,.4,.5);
+            turnLeft(84,0, 0, 0, -.35, 1.1, .5);
+            movePIDFGyro(23,1,0,0,.15,.4,.5);
         }
 
         while (opModeIsActive()) {sleep(20);}
