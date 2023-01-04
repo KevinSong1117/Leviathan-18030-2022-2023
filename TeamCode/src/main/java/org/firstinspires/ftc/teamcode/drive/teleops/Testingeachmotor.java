@@ -16,6 +16,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Testingeachmotor extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        DcMotor Ov = hardwareMap.dcMotor.get("Ov");
+        DcMotor Oh = hardwareMap.dcMotor.get("Oh");
+
         DcMotor lL = hardwareMap.dcMotor.get("lL");
         DcMotor rL = hardwareMap.dcMotor.get("rL");
         DcMotor fL = hardwareMap.dcMotor.get("fL");
@@ -118,11 +121,10 @@ public class Testingeachmotor extends LinearOpMode {
                 lO.setPosition(0);
                 rO.setPosition(1);
             }
-            telemetry.addData("Average lift encoder value:", (Math.abs(lL.getCurrentPosition()) + Math.abs(rL.getCurrentPosition()))/2);
-            telemetry.addData("Left Enocder", lL.getCurrentPosition());
-            telemetry.addData("Right Encoder", rL.getCurrentPosition());
+            telemetry.addData("Odom vertical", Ov.getCurrentPosition());
+            telemetry.addData("Odom horizontal", Oh.getCurrentPosition());
             telemetry.update();
-            //
+
         }
     }
 
