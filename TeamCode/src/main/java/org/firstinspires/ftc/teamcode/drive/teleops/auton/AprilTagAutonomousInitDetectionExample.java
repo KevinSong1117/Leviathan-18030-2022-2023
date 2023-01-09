@@ -122,7 +122,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
          */
         while (!isStarted() && !isStopRequested())
         {
-            fI.setPosition(1);
+            fI.setPosition(.45);
             bI.setPosition(0);
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
@@ -206,7 +206,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         sleep(1000);
         turnLeft(34, 0, 0, 0, -.34, 1.1, .5);
         sleep(1000);
-        moveLiftPID(230, 0,0,0,.60,2,.5);
+        moveLiftPID(100, 0,0,0,.60,2,.5);
         sleep(1000);
         movePIDFGyro(-12,1,0,0,.15,.4,.5);
         out();
