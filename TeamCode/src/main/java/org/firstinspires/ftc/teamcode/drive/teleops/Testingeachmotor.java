@@ -60,7 +60,7 @@ public class Testingeachmotor extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-            double x = gamepad1.left_stick_x; // Counteract imperfect strafing multiply by 1.1 if not work
+            double x = -gamepad1.left_stick_x; // Counteract imperfect strafing multiply by 1.1 if not work
             double rx = gamepad1.right_stick_x;
 
             // Denominator is the largest motor power (absolute value) or 1
@@ -121,6 +121,10 @@ public class Testingeachmotor extends LinearOpMode {
                 lO.setPosition(0);
                 rO.setPosition(1);
             }
+            telemetry.addData("fR", fR.getPower());
+            telemetry.addData("fL", fL.getPower());
+            telemetry.addData("bR", bR.getPower());
+            telemetry.addData("bL", bL.getPower());
             telemetry.addData("Odom vertical", Ov.getCurrentPosition());
             telemetry.addData("Odom horizontal", Oh.getCurrentPosition());
             telemetry.update();
