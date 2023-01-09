@@ -206,7 +206,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         sleep(1000);
         turnLeft(34, 0, 0, 0, -.34, 1.1, .5);
         sleep(1000);
-        moveLiftPID(100, 0,0,0,.60,2,.5);
+        moveLiftPID(150, 0,0,0,.60,2,.5);
         sleep(1000);
         movePIDFGyro(-12,1,0,0,.15,.4,.5);
         out();
@@ -505,7 +505,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             pastTime = currentTime;
             pastError = error;
         }
-        setLiftPower(.001);
+        setLiftPower(.02);
     }
     public void strafePIDGyro(double kp, double ki, double kd, double f, double inches, double threshold, double time){
         timer.reset();
@@ -630,8 +630,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void outtake(int time) {
-        fI.setPosition(.55);
-        bI.setPosition(.4);
+        fI.setPosition(.33);
+        bI.setPosition(0);
         sleep(time);
     }
     public void startMotors(double fl, double fr, double bl, double br) {
