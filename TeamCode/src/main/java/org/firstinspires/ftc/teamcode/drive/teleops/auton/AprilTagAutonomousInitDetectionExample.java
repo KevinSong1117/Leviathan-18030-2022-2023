@@ -25,6 +25,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
     public DcMotor fR;
     public DcMotor bL;  // instantiates motor variables
     public DcMotor bR;
+    public DcMotor Ov;
 
     public DcMotor rL;
     public DcMotor lL;
@@ -67,6 +68,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         fR = hardwareMap.get(DcMotor.class, "fR");
         bL = hardwareMap.get(DcMotor.class, "bL");
         bR = hardwareMap.get(DcMotor.class, "bR");
+        Ov = hardwareMap.get(DcMotor.class, "Ov");
 
         lL = hardwareMap.get(DcMotor.class, "lL");
         rL = hardwareMap.get(DcMotor.class, "rL");
@@ -200,15 +202,15 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
 
         // Actually do something useful
-        movePIDFGyro(-50,1,0,0,.15,.4,.5);
-        movePIDFGyro(-5,1,0,0,.15,.4,.5);
-        movePIDFGyro(5,1,0,0,.15,.4,.5);
+        movePIDFGyro(-47,1,0,0,.15,.4,.5);
+        //movePIDFGyro(-5,1,0,0,.15,.4,.5);
+        //movePIDFGyro(5,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnLeft(34, 0, 0, 0, -.34, 1.1, .5);
+        turnLeft(37, 0, 0, 0, -.34, 1.1, .5);
         sleep(1000);
         moveLiftPID(150, 0,0,0,.60,2,.5);
         sleep(1000);
-        movePIDFGyro(-12,1,0,0,.15,.4,.5);
+        movePIDFGyro(-13,1,0,0,.15,.4,.5);
         out();
         sleep(2000);
         outtake(2000);
@@ -221,7 +223,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
             turnRight(-86,0, 0, 0, .35, 1.1, .5);
             sleep(1000);
-            movePIDFGyro(23,1,0,0,.15,.4,.5);
+            movePIDFGyro(22,1,0,0,.15,.4,.5);
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
@@ -483,10 +485,10 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
 
             if (power > 0) {
-                setLiftPower(-power - f);
+                setLiftPower(-power - f-.02);
             }
             else {
-                setLiftPower(-power + f);
+                setLiftPower(-power + f+.02);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
@@ -505,7 +507,6 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             pastTime = currentTime;
             pastError = error;
         }
-        setLiftPower(.02);
     }
     public void strafePIDGyro(double kp, double ki, double kd, double f, double inches, double threshold, double time){
         timer.reset();
@@ -609,6 +610,95 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         fI.setPosition(1);
         bI.setPosition(0);
     }
+    public double getOdomTic(){
+        return Math.abs(Ov.getCurrentPosition());
+    }
+    public void odomPIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){
+        timer.reset();
+        resetEncoder();
+        double counts_inches = (8192)/(1.37795 * 3.1415);
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+
+        double initialError = Math.abs(inches);
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            telemetry.addData("angle", gyro.getAngle());
+            telemetry.update();
+
+            if (inches < 0){
+                error = inches + getOdomTic() / counts_inches;
+            }
+            else{
+                error = inches - getOdomTic() / counts_inches;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+
+            double difference = angleDiffSigma(initialHeading, gyro.getAngle());
+
+            if (difference > .6){
+                if (power > 0) {
+                    startMotors((power + f), (power + f), (power + f), (power + f));
+                }
+                else {
+                    startMotors((power - f), (power - f),(power - f),(power - f));
+                }
+            }
+            else if(difference < -.6){
+                if (power > 0) {
+                    startMotors((power + f), (power + f),(power + f),(power + f));
+                }
+                else {
+                    startMotors((power - f),(power - f),(power - f),(power - f));
+                }
+            }
+            else{
+                if (power > 0) {
+                    startMotors(power + f,  power + f,power + f,power + f);
+                }
+                else {
+                    startMotors(power - f,power - f,power - f,power - f);
+                }
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+
 
 
     public void resetEncoder() {

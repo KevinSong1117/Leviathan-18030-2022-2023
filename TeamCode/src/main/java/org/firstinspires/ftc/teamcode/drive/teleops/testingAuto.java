@@ -47,6 +47,7 @@ import static android.graphics.Color.green;
 public class testingAuto extends LinearOpMode
 {
     // Declare OpMode members.
+    public DcMotor Ov;
     public DcMotor fL;
     public DcMotor fR;
     public DcMotor bL;  // instantiates motor variables
@@ -59,15 +60,16 @@ public class testingAuto extends LinearOpMode
     Servo bI;
     Sensors gyro;
     ElapsedTime timer;
-    static final double COUNTS_PER_MOTOR_REV = 537.7;
+    static final double COUNTS_PER_MOTOR_REV = 537.6;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
-    static final double WHEEL_DIAMETER_INCHES = 3.7796;
+    static final double WHEEL_DIAMETER_INCHES = 3.77953;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
     @Override
     public void runOpMode() throws InterruptedException  {
         timer = new ElapsedTime();
+        Ov = hardwareMap.get(DcMotor.class, "Ov");
         fL = hardwareMap.get(DcMotor.class, "fL");
         fR = hardwareMap.get(DcMotor.class, "fR");
         bL = hardwareMap.get(DcMotor.class, "bL");
@@ -105,7 +107,8 @@ public class testingAuto extends LinearOpMode
 
         waitForStart();
 
-        moveLiftPID(220, 0,0,0,.60,2,.5);
+        //moveLiftPID(220, 0,0,0,.60,2,.5);
+        odomPIDFGyro(-40, 0,0,0, .2,.4,.5);
         //moveLiftPID(-100, 0,0,0,-.60,2,.5);
         //18 inches
         //136,11111111111108
@@ -198,6 +201,96 @@ public class testingAuto extends LinearOpMode
         bI.setPosition(.4);
         sleep(time);
     }
+    public double getOdomTic(){
+        return Math.abs(Ov.getCurrentPosition());
+    }
+
+    public void odomPIDFGyro(double inches, double kp, double ki, double kd, double f, double threshold, double time){
+        timer.reset();
+        Ov.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        double counts_inches = (8192)/(1.37795 * Math.PI);
+
+        double pastTime = 0;
+        double currentTime = timer.milliseconds();
+
+        double initialHeading = gyro.getAngle();
+
+        double initialError = Math.abs(inches * .71428571);
+        double error = initialError;
+        double pastError = error;
+
+        double integral = 0;
+
+        double timeAtSetPoint = 0;
+        double firstTimeAtSetPoint = 0;
+        boolean atSetpoint = false;
+
+
+        while (timeAtSetPoint < time && !isStopRequested() && opModeIsActive()) {
+            telemetry.addData("angle", gyro.getAngle());
+            telemetry.update();
+
+            if (inches < 0){
+                error = inches + getOdomTic() / counts_inches;
+            }
+            else{
+                error = inches - getOdomTic() / counts_inches;
+            }
+
+            currentTime = timer.milliseconds();
+            double dt = currentTime - pastTime;
+
+            double proportional = error / initialError;
+            integral += dt * ((error + pastError) / 2.0);
+            double derivative = (error - pastError) / dt;
+
+            double power = kp * proportional + ki * integral + kd * derivative;
+
+            double difference = angleDiffSigma(initialHeading, gyro.getAngle());
+
+            if (difference > .6){
+                if (power > 0) {
+                    startMotors((power + f), (power + f), (power + f), (power + f));
+                }
+                else {
+                    startMotors((power - f), (power - f),(power - f),(power - f));
+                }
+            }
+            else if(difference < -.6){
+                if (power > 0) {
+                    startMotors((power + f), (power + f),(power + f),(power + f));
+                }
+                else {
+                    startMotors((power - f),(power - f),(power - f),(power - f));
+                }
+            }
+            else{
+                if (power > 0) {
+                    startMotors(power + f,  power + f,power + f,power + f);
+                }
+                else {
+                    startMotors(power - f,power - f,power - f,power - f);
+                }
+            }
+            if (Math.abs(error) < threshold){
+                if (!atSetpoint){
+                    atSetpoint = true;
+                    firstTimeAtSetPoint = currentTime;
+                }
+                else{
+                    timeAtSetPoint = currentTime - firstTimeAtSetPoint;
+                }
+            }
+            else{
+                atSetpoint = false;
+            }
+
+            pastTime = currentTime;
+            pastError = error;
+        }
+        stopMotors();
+    }
+
 
     public void startMotors(double fl, double fr, double bl, double br) {
         fR.setPower(fr);
