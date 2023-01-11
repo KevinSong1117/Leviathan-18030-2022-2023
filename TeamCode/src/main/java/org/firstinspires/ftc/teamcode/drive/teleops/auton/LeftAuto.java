@@ -122,7 +122,7 @@ public class LeftAuto extends LinearOpMode
          */
         while (!isStarted() && !isStopRequested())
         {
-            fI.setPosition(1);
+            fI.setPosition(.45);
             bI.setPosition(0);
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
@@ -200,33 +200,33 @@ public class LeftAuto extends LinearOpMode
         }
 
         // Actually do something useful
-        movePIDFGyro(-50,1,0,0,.15,.4,.5);
-        movePIDFGyro(-5,1,0,0,.15,.4,.5);
-        movePIDFGyro(5,1,0,0,.15,.4,.5);
+        movePIDFGyro(-47,1,0,0,.15,.4,.5);
+        //movePIDFGyro(-5,1,0,0,.15,.4,.5);
+        //movePIDFGyro(5,1,0,0,.15,.4,.5);
         sleep(1000);
-        turnRight(-33, 0, 0, 0, .35, 1, .5);
+        turnRight(-38, 0, 0, 0, .35, 1.1, .5);
         sleep(1000);
-        moveLiftPID(230, 0,0,0,.60,2,.5);
+        moveLiftPID(150, 0,0,0,.60,2,.5);
         sleep(1000);
-        movePIDFGyro(-11,1,0,0,.15,.4,.5);
+        movePIDFGyro(-13,1,0,0,.15,.4,.5);
         out();
         sleep(2000);
         outtake(2000);
         in();
         sleep(1000);
-        movePIDFGyro(8,1,0,0,.15,.4,.5);
+        movePIDFGyro(7,1,0,0,.15,.4,.5);
         sleep(1000);
         turnLeft(0, 0, 0, 0, -.35, 1.1, .5);
         sleep(1000);
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
             turnRight(-86,0, 0, 0, .35, 1.1, .5);
             sleep(1000);
-            movePIDFGyro(23,1,0,0,.15,.4,.5);
+            movePIDFGyro(22,1,0,0,.15,.4,.5);
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
-            turnLeft(84,0, 0, 0, -.35, 1.1, .5);
-            movePIDFGyro(23,1,0,0,.15,.4,.5);
+            turnLeft(85,0, 0, 0, -.35, 1.1, .5);
+            movePIDFGyro(25,1,0,0,.15,.4,.5);
         }
 
         while (opModeIsActive()) {sleep(20);}
@@ -483,10 +483,10 @@ public class LeftAuto extends LinearOpMode
 
 
             if (power > 0) {
-                setLiftPower(-power - f);
+                setLiftPower(-power - f-.02);
             }
             else {
-                setLiftPower(-power + f);
+                setLiftPower(-power + f+.02);
             }
             if (Math.abs(error) < threshold){
                 if (!atSetpoint){
@@ -505,7 +505,6 @@ public class LeftAuto extends LinearOpMode
             pastTime = currentTime;
             pastError = error;
         }
-        setLiftPower(.001);
     }
     public void strafePIDGyro(double kp, double ki, double kd, double f, double inches, double threshold, double time){
         timer.reset();
@@ -630,8 +629,8 @@ public class LeftAuto extends LinearOpMode
         rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void outtake(int time) {
-        fI.setPosition(.55);
-        bI.setPosition(.4);
+        fI.setPosition(.33);
+        bI.setPosition(0);
         sleep(time);
     }
     public void startMotors(double fl, double fr, double bl, double br) {
