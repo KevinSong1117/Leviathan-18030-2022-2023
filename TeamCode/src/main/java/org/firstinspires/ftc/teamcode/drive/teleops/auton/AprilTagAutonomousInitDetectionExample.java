@@ -720,8 +720,8 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void outtake(int time) {
-        fI.setPosition(.33);
-        bI.setPosition(0);
+        fI.setPosition(.63);
+        bI.setPosition(.33);
         sleep(time);
     }
     public void startMotors(double fl, double fr, double bl, double br) {

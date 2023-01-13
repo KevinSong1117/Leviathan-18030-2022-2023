@@ -17,8 +17,6 @@ public class Testingeachmotor extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor Ov = hardwareMap.dcMotor.get("Ov");
-        DcMotor Oh = hardwareMap.dcMotor.get("Oh");
-
         DcMotor lL = hardwareMap.dcMotor.get("lL");
         DcMotor rL = hardwareMap.dcMotor.get("rL");
         DcMotor fL = hardwareMap.dcMotor.get("fL");
@@ -89,12 +87,12 @@ public class Testingeachmotor extends LinearOpMode {
 
             //open
             if (gamepad2.left_bumper) {
-                fI.setPosition(0);
+                fI.setPosition(0.63);
                 bI.setPosition(.33);
             }
             //close
             if (gamepad2.right_bumper) {
-                fI.setPosition(.45);
+                fI.setPosition(1);
                 bI.setPosition(0);
             }
 
@@ -126,7 +124,6 @@ public class Testingeachmotor extends LinearOpMode {
             telemetry.addData("bR", bR.getPower());
             telemetry.addData("bL", bL.getPower());
             telemetry.addData("Odom vertical", Ov.getCurrentPosition());
-            telemetry.addData("Odom horizontal", Oh.getCurrentPosition());
             telemetry.update();
 
         }
