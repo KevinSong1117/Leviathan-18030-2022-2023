@@ -607,7 +607,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         rL.setPower(.01);
     }
     public void intake(){
-        fI.setPosition(1);
+        fI.setPosition(.8);
         bI.setPosition(0);
     }
     public double getOdomTic(){
@@ -720,7 +720,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void outtake(int time) {
-        fI.setPosition(.63);
+        fI.setPosition(.65);
         bI.setPosition(.33);
         sleep(time);
     }

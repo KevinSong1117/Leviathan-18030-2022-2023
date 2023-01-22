@@ -87,12 +87,12 @@ public class Testingeachmotor extends LinearOpMode {
 
             //open
             if (gamepad2.left_bumper) {
-                fI.setPosition(0.63);
+                fI.setPosition(0.65);
                 bI.setPosition(.33);
             }
             //close
             if (gamepad2.right_bumper) {
-                fI.setPosition(1);
+                fI.setPosition(0.8);
                 bI.setPosition(0);
             }
 
