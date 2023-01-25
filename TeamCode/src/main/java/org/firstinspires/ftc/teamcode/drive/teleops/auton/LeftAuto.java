@@ -122,8 +122,7 @@ public class LeftAuto extends LinearOpMode
          */
         while (!isStarted() && !isStopRequested())
         {
-            fI.setPosition(.45);
-            bI.setPosition(0);
+            fI.setPosition(.78);
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
             if(currentDetections.size() != 0)
@@ -210,8 +209,9 @@ public class LeftAuto extends LinearOpMode
         sleep(1000);
         movePIDFGyro(-13,1,0,0,.15,.4,.5);
         out();
-        sleep(2000);
-        outtake(2000);
+        sleep(1000);
+        outtake(1000);
+        fI.setPosition(.78);
         in();
         sleep(1000);
         movePIDFGyro(7,1,0,0,.15,.4,.5);
@@ -629,8 +629,7 @@ public class LeftAuto extends LinearOpMode
         rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void outtake(int time) {
-        fI.setPosition(.65);
-        bI.setPosition(.33);
+        fI.setPosition(.61);
         sleep(time);
     }
     public void startMotors(double fl, double fr, double bl, double br) {

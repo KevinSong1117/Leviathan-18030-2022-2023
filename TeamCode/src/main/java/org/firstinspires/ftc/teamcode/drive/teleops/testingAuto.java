@@ -102,13 +102,12 @@ public class testingAuto extends LinearOpMode
         bR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         bL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        fI.setPosition(1);
-        bI.setPosition(0);
+
 
         waitForStart();
 
         //moveLiftPID(220, 0,0,0,.60,2,.5);
-        odomPIDFGyro(-40, 0,0,0, .2,.4,.5);
+        //odomPIDFGyro(-40, 0,0,0, .2,.4,.5);
         //moveLiftPID(-100, 0,0,0,-.60,2,.5);
         //18 inches
         //136,11111111111108
@@ -116,7 +115,7 @@ public class testingAuto extends LinearOpMode
         //This works quite well have tested it twice
         //moveLiftPID(10, 0, 0, 0, .3, .5, .5);
         //35 inches
-        //movePIDFGyro(30,1,0,0,.15,.3,.5);
+        movePIDFGyro(-40,1,0,0,.15,.3,.5);
 
         /*movePIDFGyro(-48,1,0,0,.15,.4,.5);
         sleep(1000);
@@ -419,26 +418,26 @@ public class testingAuto extends LinearOpMode
 
             if (difference > .6){
                 if (power > 0) {
-                    startMotors((power + f), (power + f), (power + f), (power + f));
+                    startMotors((power + f), (power + f) * .9, (power + f), (power + f) * .9);
                 }
                 else {
-                    startMotors((power - f), (power - f),(power - f),(power - f));
+                    startMotors((power - f), (power - f) * .9,(power - f),(power - f) * .9);
                 }
             }
             else if(difference < -.6){
                 if (power > 0) {
-                    startMotors((power + f), (power + f),(power + f),(power + f));
+                    startMotors((power + f), (power + f) * .9,(power + f),(power + f) * .9);
                 }
                 else {
-                    startMotors((power - f),(power - f),(power - f),(power - f));
+                    startMotors((power - f),(power - f) * .9,(power - f),(power - f) * .9);
                 }
             }
             else{
                 if (power > 0) {
-                    startMotors(power + f,  power + f,power + f,power + f);
+                    startMotors(power + f,  (power + f) * .9,power + f,(power + f) * .9);
                 }
                 else {
-                    startMotors(power - f,power - f,power - f,power - f);
+                    startMotors(power - f,(power - f) * .9,power - f,(power - f) * .9);
                 }
             }
             if (Math.abs(error) < threshold){

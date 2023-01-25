@@ -124,8 +124,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
          */
         while (!isStarted() && !isStopRequested())
         {
-            fI.setPosition(.45);
-            bI.setPosition(0);
+            fI.setPosition(.78);
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
             if(currentDetections.size() != 0)
@@ -210,25 +209,28 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         sleep(1000);
         moveLiftPID(150, 0,0,0,.60,2,.5);
         sleep(1000);
-        movePIDFGyro(-13,1,0,0,.15,.4,.5);
+        movePIDFGyro(-9,1,0,0,.15,.4,.5);
         out();
-        sleep(2000);
-        outtake(2000);
+        sleep(1000);
+        outtake(1000);
+        fI.setPosition(.78);
         in();
         sleep(1000);
-        movePIDFGyro(7,1,0,0,.15,.4,.5);
+        movePIDFGyro(8,1,0,0,.15,.4,.5);
         sleep(1000);
         turnRight(0, 0, 0, 0, .35, 1.1, .5);
         sleep(1000);
+        lL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         if(tagOfInterest == null || tagOfInterest.id == LEFT){
             turnRight(-86,0, 0, 0, .35, 1.1, .5);
             sleep(1000);
-            movePIDFGyro(22,1,0,0,.15,.4,.5);
+            movePIDFGyro(21,1,0,0,.15,.4,.5);
         }else if(tagOfInterest.id == MIDDLE){
             //nothing is needed as it is already in parking zone
         }else if(tagOfInterest.id == RIGHT){
             turnLeft(85,0, 0, 0, -.35, 1.1, .5);
-            movePIDFGyro(25,1,0,0,.15,.4,.5);
+            movePIDFGyro(24,1,0,0,.15,.4,.5);
         }
 
         while (opModeIsActive()) {sleep(20);}
@@ -287,26 +289,26 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
             if (difference > .6){
                 if (power > 0) {
-                    startMotors((power + f), (power + f), (power + f), (power + f));
+                    startMotors((power + f), (power + f) * .91, (power + f), (power + f) * .91);
                 }
                 else {
-                    startMotors((power - f), (power - f),(power - f),(power - f));
+                    startMotors((power - f), (power - f) * .91,(power - f),(power - f) * .91);
                 }
             }
             else if(difference < -.6){
                 if (power > 0) {
-                    startMotors((power + f), (power + f),(power + f),(power + f));
+                    startMotors((power + f), (power + f) * .91,(power + f),(power + f) * .91);
                 }
                 else {
-                    startMotors((power - f),(power - f),(power - f),(power - f));
+                    startMotors((power - f),(power - f) * .91,(power - f),(power - f) * .91);
                 }
             }
             else{
                 if (power > 0) {
-                    startMotors(power + f,  power + f,power + f,power + f);
+                    startMotors(power + f,  (power + f) * .91,power + f,(power + f) * .91);
                 }
                 else {
-                    startMotors(power - f,power - f,power - f,power - f);
+                    startMotors(power - f,(power - f) * .91,power - f,(power - f) * .91);
                 }
             }
             if (Math.abs(error) < threshold){
@@ -720,8 +722,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void outtake(int time) {
-        fI.setPosition(.65);
-        bI.setPosition(.33);
+        fI.setPosition(.61);
         sleep(time);
     }
     public void startMotors(double fl, double fr, double bl, double br) {
